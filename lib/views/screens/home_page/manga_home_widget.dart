@@ -1,5 +1,6 @@
-import '../../../core/index.dart';
-import '../../../data/index.dart';
+import '/core/index.dart';
+import '/views/index.dart';
+import '/data/index.dart';
 
 class MangaHomeWidget extends StatefulWidget {
   final MangaController controller;
@@ -47,7 +48,7 @@ class _MangaHomeWidgetState extends State<MangaHomeWidget> {
                 controller: widget.controller,
                 params: const {
                   // "status[]": ["completed"],
-                  'contentRating[]': ['suggestive', 'safe'],
+                  'contentRating[]': ['suggestive'],
                 },
               ),
             ),

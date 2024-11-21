@@ -1,4 +1,4 @@
-import '../index.dart';
+import '../../index.dart';
 
 class BaseMangaResponse {
   String? result;

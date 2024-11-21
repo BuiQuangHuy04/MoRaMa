@@ -1,4 +1,4 @@
-import '../../core/index.dart';
+import '/core/index.dart';
 
 class LoadingWidget extends StatelessWidget {
   const LoadingWidget({super.key});

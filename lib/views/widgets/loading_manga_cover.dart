@@ -1,6 +1,6 @@
-import 'package:morama/data/index.dart';
-
-import '../../core/index.dart';
+import '/views/index.dart';
+import '/data/index.dart';
+import '/core/index.dart';
 
 class LoadingMangaCover extends StatefulWidget {
   final MangaController? controller;
@@ -53,22 +53,22 @@ class _LoadingMangaCoverState extends State<LoadingMangaCover> {
             final fileName = snapshot2.data;
 
             var coverUrl =
-                '${Constants.MEDIA_API}${widget.manga.id!}//$fileName';
+                '${Constants.mediaAPI}${widget.manga.id!}//$fileName';
             return GestureDetector(
               onTap: () {
                 debugPrint('loading_manga_cover: manga: ${widget.manga}');
                 debugPrint('loading_manga_cover: coverUrl:${widget.coverUrl}');
 
                 Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MangaDetailPage(
-                    widget.manga,
-                    coverUrl: coverUrl,
-                    controller: widget.controller!,
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MangaDetailPage(
+                      widget.manga,
+                      coverUrl: coverUrl,
+                      controller: widget.controller!,
+                    ),
                   ),
-                ),
-              );
+                );
               },
               child: Container(
                 width: widget.width,
@@ -76,7 +76,13 @@ class _LoadingMangaCoverState extends State<LoadingMangaCover> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                   image: DecorationImage(
-                    image: NetworkImage(coverUrl),
+                    image: NetworkImage(
+                      coverUrl,
+                      headers: {
+                        'Connection': 'Keep-Alive',
+                        'Keep-Alive': 'timeout=5, max=1000'
+                      },
+                    ),
                     fit: BoxFit.cover,
                   ),
                 ),

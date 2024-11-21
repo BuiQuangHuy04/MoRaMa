@@ -1,4 +1,5 @@
 import '/core/index.dart';
+import '/views/index.dart';
 import '/data/index.dart';
 
 class MangaDetailPage extends StatefulWidget {
@@ -57,7 +58,7 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
                       Text(
                         widget.manga.attributes!.description!.en == null
                             ? ''
-                            : 'Overview',
+                            : 'Description',
                         style: const TextStyle(
                           fontSize: 22.0,
                           fontWeight: FontWeight.bold,
@@ -82,7 +83,7 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                "Release Date",
+                                "Release date",
                                 style: TextStyle(
                                   fontSize: 18.0,
                                   fontWeight: FontWeight.bold,
@@ -101,7 +102,7 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                "Rating",
+                                "Content rating",
                                 style: TextStyle(
                                   fontSize: 18.0,
                                   fontWeight: FontWeight.bold,

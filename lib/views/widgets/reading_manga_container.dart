@@ -1,5 +1,6 @@
-import '../../core/index.dart';
-import '../../data/index.dart';
+import '/views/index.dart';
+import '/data/index.dart';
+import '/core/index.dart';
 
 class ReadingMangaContainer extends StatefulWidget {
   // final Manga? manga;
@@ -20,8 +21,12 @@ class _ReadingMangaContainerState extends State<ReadingMangaContainer> {
   Widget build(BuildContext context) {
     return widget.controller != null
         ? FutureBuilder(
-            future: widget.controller!
-                .fetchListManga(params: {'title': 'Solo Leveling'}),
+            future: widget.controller!.fetchListManga(
+              params: {
+                // 'publicationDemographic[]': ['seinen'],
+                'title': 'solo leveling'
+              },
+            ),
             builder: (context, snapshot1) {
               if (snapshot1.connectionState == ConnectionState.waiting) {
                 return const LoadingWidget();
@@ -32,7 +37,7 @@ class _ReadingMangaContainerState extends State<ReadingMangaContainer> {
               } else if (snapshot1.hasData) {
                 var listManga = snapshot1.data;
                 var manga = listManga!.first;
-                print(manga.id);
+                debugPrint(manga.id);
                 return Container(
                   height: 182,
                   margin: const EdgeInsets.symmetric(horizontal: 12),
@@ -45,76 +50,88 @@ class _ReadingMangaContainerState extends State<ReadingMangaContainer> {
                       ),
                       const Gap(12),
                       Expanded(
-                          child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              manga.attributes!.title!.en!,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              ),
-                            ),
-                            Text(
-                              manga.attributes!.lastChapter != ''
-                                  ? manga.attributes!.lastChapter!
-                                  : manga.attributes!.lastVolume != ''
-                                      ? manga.attributes!.lastVolume!
-                                      : 'Ongoing',
-                              style: const TextStyle(
-                                color: Colors.white,
-                              ),
-                            ),
-                            const Gap(12),
-                            const Text(
-                              'Unknown',
-                              style: TextStyle(
-                                color: Colors.grey,
-                              ),
-                            ),
-                            const Gap(24),
-                            const Row(
-                              children: [
-                                Text(
-                                  "78%",
-                                  style: TextStyle(
-                                    color: Colors.amberAccent,
-                                  ),
-                                ),
-                                Gap(12),
-                                Text(
-                                  "20 min left",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Gap(4),
-                            const LinearProgressIndicator(
-                              value: .7,
-                              color: Colors.amberAccent,
-                            ),
-                            const Gap(12),
-                            Container(
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                              decoration: BoxDecoration(
-                                  color: Colors.amberAccent,
-                                  borderRadius: BorderRadius.circular(5)),
-                              child: const Center(
-                                child: Text(
-                                  "Continue Reading",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                manga.attributes!.title!.en!,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
                                 ),
                               ),
-                            )
-                          ],
+                              Text(
+                                manga.attributes!.lastChapter != ''
+                                    ? 'Chapter ${manga.attributes!.lastChapter!}'
+                                    : 'Ongoing',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const Gap(12),
+                              Text(
+                                // manga.relationships![1].attributes!.name!,
+                                manga.relationships!.any((relationship) =>
+                                        relationship.type == 'author')
+                                    ? manga.relationships!
+                                        .where((relationship) =>
+                                            relationship.type == 'author')
+                                        .first
+                                        .attributes!
+                                        .name!
+                                    : '',
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              const Gap(24),
+                              const Row(
+                                children: [
+                                  Text(
+                                    "78%",
+                                    style: TextStyle(
+                                      color: Colors.amberAccent,
+                                    ),
+                                  ),
+                                  Gap(12),
+                                  Text(
+                                    "20 min left",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const Gap(4),
+                              const LinearProgressIndicator(
+                                value: .7,
+                                color: Colors.amberAccent,
+                              ),
+                              const Gap(12),
+                              GestureDetector(
+                                onTap: () {},
+                                child: Container(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8),
+                                  decoration: BoxDecoration(
+                                      color: Colors.amberAccent,
+                                      borderRadius: BorderRadius.circular(5)),
+                                  child: const Center(
+                                    child: Text(
+                                      "Continue Reading",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
                         ),
-                      ))
+                      )
                     ],
                   ),
                 );

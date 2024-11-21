@@ -1,7 +1,9 @@
-import '../../core/index.dart';
-import '../../data/index.dart';
+import '/views/index.dart';
+import '/data/index.dart';
+import '/core/index.dart';
 
 class AllMangaWidget extends StatefulWidget {
+
   final MangaController controller;
   final Map<String, dynamic>? params;
   final bool canLoadMore;
@@ -29,13 +31,16 @@ class _AllMangaWidgetState extends State<AllMangaWidget> {
     if (widget.params != null) {
       _params.addAll(widget.params!);
     }
+    debugPrint('all_manga_widget: initState: $_params');
   }
 
   void nextOffset() {
     setState(() {
       _curPage += 1;
       _curOffset = _curPage * 10;
-      _params = {'offset': '$_curOffset'};
+      _params = {
+        'offset': '$_curOffset',
+      };
       if (widget.params != null) {
         _params.addAll(widget.params!);
       }
@@ -46,7 +51,9 @@ class _AllMangaWidgetState extends State<AllMangaWidget> {
     setState(() {
       _curPage -= 1;
       _curOffset = _curPage * 10;
-      _params = {'offset': '$_curOffset'};
+      _params = {
+        'offset': '$_curOffset',
+      };
       if (widget.params != null) {
         _params.addAll(widget.params!);
       }
@@ -55,8 +62,14 @@ class _AllMangaWidgetState extends State<AllMangaWidget> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.params != null) {
+      _params.addAll(widget.params!);
+    }
+    debugPrint('all_manga_widget: build: $_params');
     return FutureBuilder(
-      future: widget.controller.fetchListManga(params: _params),
+      future: widget.controller.fetchListManga(
+        params: _params,
+      ),
       builder: (context, snapshot1) {
         if (snapshot1.connectionState == ConnectionState.waiting) {
           return const LoadingWidget();
@@ -97,27 +110,54 @@ class _AllMangaWidgetState extends State<AllMangaWidget> {
                       right: 10,
                       child: Column(
                         children: [
-                          FloatingActionButton(
-                            heroTag: '<next_discover_page_btn>',
-                            onPressed: () {
-                              nextOffset();
-                            },
-                            backgroundColor: Colors.amberAccent,
-                            child: Icon(Icons.chevron_right_outlined),
+                          ElevatedButton.icon(
+                            onPressed: nextOffset,
+                            icon: const Icon(
+                              Icons.chevron_right_outlined,
+                              color: Colors.white,
+                            ),
+                            label: Text(
+                              '${_curPage + 2}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.amberAccent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 10,
+                              ),
+                            ),
                           ),
-                          _curPage >= 1
-                              ? Padding(
-                                  padding: const EdgeInsets.only(top: 10),
-                                  child: FloatingActionButton(
-                                    heroTag: '<pre_discover_page_btn>',
-                                    onPressed: () {
-                                      preOffset();
-                                    },
-                                    backgroundColor: Colors.amberAccent,
-                                    child: Icon(Icons.chevron_left_outlined),
-                                  ),
-                                )
-                              : Container(),
+                          const SizedBox(height: 8),
+                          if (_curPage >= 1)
+                            ElevatedButton.icon(
+                              onPressed: preOffset,
+                              icon: const Icon(
+                                Icons.chevron_left_outlined,
+                                color: Colors.white,
+                              ),
+                              label: Text(
+                                '$_curPage',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.amberAccent,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 10,
+                                ),
+                              ),
+                            ),
                         ],
                       ),
                     )

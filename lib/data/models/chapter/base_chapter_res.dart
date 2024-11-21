@@ -1,3 +1,5 @@
+import '../../../core/constant.dart';
+
 class BaseChapterRes {
   String? result;
   String? response;
@@ -118,10 +120,10 @@ class ChapterAttributes {
     title = json['title'];
     translatedLanguage = json['translatedLanguage'];
     // externalUrl = json['externalUrl'];
-    publishAt = json['publishAt'];
-    readableAt = json['readableAt'];
-    createdAt = json['createdAt'];
-    updatedAt = json['updatedAt'];
+    publishAt = getDate(json['publishAt']);
+    readableAt = getDate(json['readableAt']);
+    createdAt = getDate(json['createdAt']);
+    updatedAt = getDate(json['updatedAt']);
     pages = json['pages'];
     version = json['version'];
   }

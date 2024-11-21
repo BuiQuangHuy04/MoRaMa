@@ -1,6 +1,5 @@
-import 'package:flutter/foundation.dart';
-
-import '../index.dart';
+import '../../../core/constant.dart';
+import '../../index.dart';
 
 class Attributes {
   Title? title;
@@ -75,8 +74,8 @@ class Attributes {
     }
     state = json['state'];
     chapterNumbersResetOnNewVolume = json['chapterNumbersResetOnNewVolume'];
-    createdAt = json['createdAt'];
-    updatedAt = json['updatedAt'];
+    createdAt = getDate(json['createdAt']);
+    updatedAt = getDate(json['updatedAt']);
     version = json['version'];
     availableTranslatedLanguages =
         json['availableTranslatedLanguages'].cast<String>();

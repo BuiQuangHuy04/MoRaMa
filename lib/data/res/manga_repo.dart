@@ -8,13 +8,24 @@ class MangaRepo implements Repository {
     try {
       List<Manga> listManga = [];
 
+      Map<String, dynamic> params0 = {
+        // 'contentRating[]': ['safe'],
+        'status[]': ['completed'],
+        'includes[]': ['cover_art', 'artist', 'author'],
+      };
+
+      if (params != null) {
+        params0.addAll(params);
+        debugPrint('manga_repo: getListManga: _params: $params0');
+      }
+
       var url = Uri.https(
-        Constants.API,
-        Constants.MANGA_EP,
-        params,
+        Constants.api,
+        Constants.mangaEP,
+        params0,
       );
 
-      // debugPrint('manga_repo: getListManga url: $url');
+      debugPrint('manga_repo: getListManga url: $url');
 
       final response = await http.get(url);
 
@@ -42,12 +53,16 @@ class MangaRepo implements Repository {
     try {
       String fileName = '';
 
+      Map<String, dynamic> params = {
+        'includes[]': ['cover_art', 'artist', 'author'],
+      };
+
+      debugPrint('manga_repo: getFileNameCover: _params: $params');
+
       var url = Uri.https(
-        Constants.API,
-        Constants.MANGA_EP + mangaId,
-        {
-          'includes[]': 'cover_art',
-        },
+        Constants.api,
+        Constants.mangaEP + mangaId,
+        params,
       );
 
       // debugPrint('manga_repo: getFileNameCover url: $url');
@@ -86,13 +101,22 @@ class MangaRepo implements Repository {
     try {
       List<Chapter> chapters = [];
 
+      Map<String, dynamic> params0 = {
+        'includes[]': ['scanlation_group', 'manga', 'user'],
+      };
+
+      if (params != null) {
+        params0.addAll(params);
+        debugPrint('manga_repo: getListManga: _params: $params0');
+      }
+
       var url = Uri.https(
-        Constants.API,
-        Constants.MANGA_EP + mangaId.toString() + Constants.CHAPTER_EP,
-        params,
+        Constants.api,
+        Constants.mangaEP + mangaId.toString() + Constants.chapterEP,
+        params0,
       );
 
-      // debugPrint('manga_repo: getListChapter url: $url');
+      debugPrint('manga_repo: getListChapter url: $url');
 
       final response = await http.get(url);
 
@@ -104,7 +128,6 @@ class MangaRepo implements Repository {
         final baseChapterRes = BaseChapterRes.fromJson(json);
 
         if (baseChapterRes.chapters != null) {
-
           chapters.addAll(baseChapterRes.chapters!);
 
           chapters.sort(
@@ -134,12 +157,12 @@ class MangaRepo implements Repository {
       ChapterResource chaptersImg = ChapterResource();
 
       var url = Uri.https(
-        Constants.API,
-        Constants.CHAPTER_MEDIA_EP+'//'+chapterId,
+        Constants.api,
+        Constants.chapterMediaEP+chapterId,
         params,
       );
 
-      // print('manga_repo: chapter media url: $url');
+      // debugPrint('manga_repo: getListChapterImg url: $url');
 
       final response = await http.get(url);
 
@@ -149,11 +172,11 @@ class MangaRepo implements Repository {
 
         if (chapterImgRes.chapter != null) {
           if (chapterImgRes.chapter!.data != null) {
-            chaptersImg= chapterImgRes.chapter!;
+            chaptersImg = chapterImgRes.chapter!;
           }
         }
       }
-      print(chaptersImg.data!.length);
+      debugPrint(chaptersImg.data!.length.toString());
       return chaptersImg;
     } catch (e) {
       debugPrint('manga_repo: getListChapterImg: err: ${e.toString()}');

@@ -1,5 +1,6 @@
-import '../../core/index.dart';
-import '../../data/index.dart';
+import '/views/index.dart';
+import '/data/index.dart';
+import '/core/index.dart';
 
 class SuggestedMangaWidget extends StatefulWidget {
   final MangaController controller;
@@ -16,8 +17,8 @@ class _SuggestedMangaWidgetState extends State<SuggestedMangaWidget> {
     return FutureBuilder(
       future: widget.controller.fetchListManga(params: {
         // "status[]": ["completed"],
-        'contentRating[]': ['suggestive','safe']
-      }),
+        // 'contentRating[]': ['suggestive']
+      },),
       builder: (context, snapshot1) {
         if (snapshot1.connectionState == ConnectionState.waiting) {
           return const LoadingWidget();

@@ -1,4 +1,4 @@
-import '../index.dart';
+import '../../index.dart';
 
 //https://uploads.mangadex.org/covers/[BaseCoverRes>data>id]/[BaseCoverRes>data>relationships[2]>]
 class BaseCoverRes {

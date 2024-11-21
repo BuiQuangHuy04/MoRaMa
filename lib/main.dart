@@ -1,9 +1,16 @@
-import 'package:flutter/material.dart';
-
-import 'views/screens/manga_home_page.dart';
+import 'views/index.dart';
+import 'core/index.dart';
+import 'data/index.dart';
 
 void main() {
-  runApp(const MangaApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => MangaProvider()),
+      ],
+      child: const MangaApp(),
+    ),
+  );
 }
 
 class MangaApp extends StatelessWidget {

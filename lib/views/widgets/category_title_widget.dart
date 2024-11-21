@@ -1,4 +1,4 @@
-import '../../core/index.dart';
+import '/core/index.dart';
 
 class CategoryTitleWidget extends StatelessWidget {
   final BuildContext context;

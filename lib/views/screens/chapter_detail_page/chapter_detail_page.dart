@@ -1,4 +1,3 @@
-import 'package:morama/data/controllers/manga_controller.dart';
 import 'package:morama/data/index.dart';
 
 import '../../../core/index.dart';
