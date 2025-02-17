@@ -2,41 +2,35 @@ import '/views/index.dart';
 import '/data/index.dart';
 import '/core/index.dart';
 
-class SuggestedMangaWidget extends StatefulWidget {
+class SuggestedMangaWidget extends StatelessWidget {
   final MangaController controller;
 
   const SuggestedMangaWidget({super.key, required this.controller});
 
   @override
-  State<SuggestedMangaWidget> createState() => _SuggestedMangaWidgetState();
-}
-
-class _SuggestedMangaWidgetState extends State<SuggestedMangaWidget> {
-  @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: widget.controller.fetchListManga(params: {
-        // "status[]": ["completed"],
-        // 'contentRating[]': ['suggestive']
-      },),
-      builder: (context, snapshot1) {
-        if (snapshot1.connectionState == ConnectionState.waiting) {
+    debugPrint('suggested_manga_widget: build');
+    return Consumer<MangaProvider>(
+      builder: (context, provider, child) {
+        if (provider.isLoading[MangaKey.SUGGESTED.key]!) {
           return const LoadingWidget();
-        } else if (snapshot1.hasError) {
+        } else if (provider.error[MangaKey.SUGGESTED.key] != null) {
           return Center(
-            child: Text('Error: ${snapshot1.error}'),
+            child: Text(
+              'Error: ${provider.error[MangaKey.SUGGESTED.key]}',
+              overflow: TextOverflow.clip,
+            ),
           );
-        } else if (snapshot1.hasData) {
-          var listManga = snapshot1.data;
-
+        } else if (provider.manga[MangaKey.SUGGESTED.key]!.isNotEmpty) {
           return Container(
             height: 260,
             margin: const EdgeInsets.only(left: 16),
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: listManga!.length,
+              itemCount: provider.manga[MangaKey.SUGGESTED.key]!.length,
               itemBuilder: (context, index) {
-                var manga = listManga.elementAt(index);
+                var manga =
+                    provider.manga[MangaKey.SUGGESTED.key]!.elementAt(index);
 
                 return Container(
                   width: 120,
@@ -45,14 +39,16 @@ class _SuggestedMangaWidgetState extends State<SuggestedMangaWidget> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       LoadingMangaCover(
-                        controller: widget.controller,
+                        controller: controller,
                         manga: manga,
                         width: 120,
                         height: 180,
                       ),
                       const Gap(8),
                       Text(
-                        manga.attributes!.title!.en.toString(),
+                        manga.attributes!.title!.en != null
+                            ? manga.attributes!.title!.en.toString()
+                            : manga.attributes!.title!.ja.toString(),
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -79,7 +75,7 @@ class _SuggestedMangaWidgetState extends State<SuggestedMangaWidget> {
           );
         } else {
           return const Center(
-            child: Text('No manga found'),
+            child: LoadingWidget(),
           );
         }
       },

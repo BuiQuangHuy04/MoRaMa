@@ -2,50 +2,41 @@ import '/views/index.dart';
 import '/data/index.dart';
 import '/core/index.dart';
 
-class ReadingMangaContainer extends StatefulWidget {
-  // final Manga? manga;
+class ReadingMangaContainer extends StatelessWidget {
   final MangaController? controller;
 
   const ReadingMangaContainer({
     super.key,
-    // this.manga,
     this.controller,
   });
 
   @override
-  State<ReadingMangaContainer> createState() => _ReadingMangaContainerState();
-}
-
-class _ReadingMangaContainerState extends State<ReadingMangaContainer> {
-  @override
   Widget build(BuildContext context) {
-    return widget.controller != null
-        ? FutureBuilder(
-            future: widget.controller!.fetchListManga(
-              params: {
-                // 'publicationDemographic[]': ['seinen'],
-                'title': 'solo leveling'
-              },
-            ),
-            builder: (context, snapshot1) {
-              if (snapshot1.connectionState == ConnectionState.waiting) {
+    debugPrint('reading_manga_widget: build');
+    return controller != null
+        ? Consumer<MangaProvider>(
+            builder: (context, provider, child) {
+              if (provider.isLoading[MangaKey.READING.key]!) {
                 return const LoadingWidget();
-              } else if (snapshot1.hasError) {
+              } else if (provider.error[MangaKey.READING.key] != null) {
                 return Center(
-                  child: Text('Error ${snapshot1.error}'),
+                  child: Text(
+                    'Error: ${provider.error[MangaKey.READING.key]}',
+                    overflow: TextOverflow.clip,
+                  ),
                 );
-              } else if (snapshot1.hasData) {
-                var listManga = snapshot1.data;
-                var manga = listManga!.first;
-                debugPrint(manga.id);
+              } else if (provider.manga[MangaKey.READING.key]!.isNotEmpty) {
+                final manga = provider.manga[MangaKey.READING.key]!.first;
+
                 return Container(
                   height: 182,
+                  width: MediaQuery.sizeOf(context).width,
                   margin: const EdgeInsets.symmetric(horizontal: 12),
                   child: Row(
                     children: [
                       LoadingMangaCover(
                         width: 120,
-                        controller: widget.controller!,
+                        controller: controller!,
                         manga: manga,
                       ),
                       const Gap(12),
@@ -72,7 +63,6 @@ class _ReadingMangaContainerState extends State<ReadingMangaContainer> {
                               ),
                               const Gap(12),
                               Text(
-                                // manga.relationships![1].attributes!.name!,
                                 manga.relationships!.any((relationship) =>
                                         relationship.type == 'author')
                                     ? manga.relationships!
@@ -136,10 +126,10 @@ class _ReadingMangaContainerState extends State<ReadingMangaContainer> {
                   ),
                 );
               } else {
-                return Container();
+                return const LoadingWidget();
               }
             },
           )
-        : Container();
+        : const LoadingWidget();
   }
 }

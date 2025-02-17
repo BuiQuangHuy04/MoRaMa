@@ -32,6 +32,7 @@ class _LoadingMangaCoverState extends State<LoadingMangaCover> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           image: DecorationImage(
+            filterQuality: FilterQuality.high,
             image: NetworkImage(widget.coverUrl!),
             fit: BoxFit.cover,
           ),
@@ -76,6 +77,7 @@ class _LoadingMangaCoverState extends State<LoadingMangaCover> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                   image: DecorationImage(
+                    filterQuality: FilterQuality.high,
                     image: NetworkImage(
                       coverUrl,
                       headers: {

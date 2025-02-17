@@ -39,7 +39,13 @@ class _MangaDiscoverWidgetState extends State<MangaDiscoverWidget> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    debugPrint('manga_discover_widget: build');
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -62,35 +68,50 @@ class _MangaDiscoverWidgetState extends State<MangaDiscoverWidget> {
                   itemBuilder: (context, index) {
                     return InkWell(
                       onTap: () {
-                        provider.updateFilter(filter[index]);
-                        if (widget.params != null) {
-                          _params.addAll(widget.params!);
-                        }
-                        if (publicationDemographic.contains(
-                            provider.curFilter.values.first.toLowerCase())) {
+                        if (provider.curFilter.isEmpty ||
+                            provider.curFilter.keys.first != filter[index]) {
+                          provider.updateFilter(filter[index]);
+
+                          if (widget.params != null) {
+                            _params.addAll(widget.params!);
+                          }
+                          if (provider.curFilter.values.isNotEmpty &&
+                              publicationDemographic.contains(provider
+                                  .curFilter.values.first
+                                  .toLowerCase())) {
+                            debugPrint(
+                                'manga_discover_page: onTap: publicationDemographic contain filter str: '
+                                '${publicationDemographic.contains(provider.curFilter.values.first.toLowerCase())}');
+                            _params.addAll({
+                              'publicationDemographic[]': [
+                                provider.curFilter.values.first.toLowerCase(),
+                              ],
+                            });
+                          } else if (includedTags
+                              .contains(provider.curFilter)) {
+                            debugPrint(
+                                'manga_discover_page: onTap: includedTags contain filter str: '
+                                '${includedTags.contains(provider.curFilter)}');
+                            _params.addAll({
+                              'includedTags[]': provider.curFilter.values.first,
+                            });
+                          }
                           debugPrint(
-                              'manga_discover_page: onTap: publicationDemographic contain filter str: '
-                              '${publicationDemographic.contains(provider.curFilter.values.first.toLowerCase())}');
-                          _params.addAll({
-                            'publicationDemographic[]': [
-                              provider.curFilter.values.first.toLowerCase(),
-                            ],
-                          });
-                        } else if (includedTags.contains(provider.curFilter)) {
-                          debugPrint(
-                              'manga_discover_page: onTap: includedTags contain filter str: '
-                              '${includedTags.contains(provider.curFilter)}');
-                          _params.addAll({
-                            'includedTags[]': provider.curFilter.values.first,
-                          });
+                              'manga_discover_page: onTap: _params: $_params');
+                          provider.updateDiscoverParam(_params);
+                          provider.fetchMangaList(
+                            context,
+                            MangaKey.ALL.key,
+                            params: provider.discoverParam,
+                          );
                         }
-                        debugPrint(
-                            'manga_discover_page: onTap: _params: $_params');
                       },
                       child: Container(
                         decoration: BoxDecoration(
                           color: provider.curFilter.keys.isNotEmpty
-                              ? filter[index] == provider.curFilter.keys.first
+                              ? filter[index].toString().toLowerCase() ==
+                                      provider.curFilter.keys.first
+                                          .toLowerCase()
                                   ? Colors.amberAccent
                                   : Colors.white.withOpacity(.2)
                               : Colors.white.withOpacity(.2),
@@ -114,22 +135,22 @@ class _MangaDiscoverWidgetState extends State<MangaDiscoverWidget> {
                 ),
               ),
               const Gap(16),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
                     Text(
-                      "83 books",
-                      style: TextStyle(
+                      '${provider.total} mangas',
+                      style: const TextStyle(
                         color: Colors.white,
                       ),
                     ),
-                    Spacer(),
-                    Text(
+                    const Spacer(),
+                    const Text(
                       "by Popularity",
                       style: TextStyle(color: Colors.white),
                     ),
-                    Icon(
+                    const Icon(
                       Icons.keyboard_arrow_down,
                       color: Colors.white,
                     )
@@ -137,12 +158,7 @@ class _MangaDiscoverWidgetState extends State<MangaDiscoverWidget> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  16.0,
-                  16,
-                  16,
-                  0,
-                ),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                 child: AllMangaWidget(
                   controller: widget.controller,
                   params: _params,

@@ -1,3 +1,5 @@
+import 'package:morama/data/providers/home_provider.dart';
+
 import 'views/index.dart';
 import 'core/index.dart';
 import 'data/index.dart';
@@ -7,6 +9,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => MangaProvider()),
+        ChangeNotifierProvider(create: (_) => HomeProvider()),
       ],
       child: const MangaApp(),
     ),

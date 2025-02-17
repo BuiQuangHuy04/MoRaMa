@@ -2,23 +2,14 @@ import '/core/index.dart';
 import '/views/index.dart';
 import '/data/index.dart';
 
-class MangaHomeWidget extends StatefulWidget {
+class MangaHomeWidget extends StatelessWidget {
   final MangaController controller;
 
   const MangaHomeWidget({super.key, required this.controller});
 
   @override
-  State<MangaHomeWidget> createState() => _MangaHomeWidgetState();
-}
-
-class _MangaHomeWidgetState extends State<MangaHomeWidget> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    debugPrint('manga_home_widget: build');
     return Scaffold(
       backgroundColor: MyColor.scaffoldBackground,
       appBar: AppBar(
@@ -38,35 +29,35 @@ class _MangaHomeWidgetState extends State<MangaHomeWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ReadingMangaContainer(controller: widget.controller),
+            ReadingMangaContainer(controller: controller),
             const Gap(16),
             CategoryTitleWidget(
               context: context,
               title: 'FOR YOU',
               screen: MangaDiscoverWidget(
                 title: 'FOR YOU',
-                controller: widget.controller,
+                controller: controller,
                 params: const {
                   // "status[]": ["completed"],
                   'contentRating[]': ['suggestive'],
                 },
               ),
             ),
-            SuggestedMangaWidget(controller: widget.controller),
+            SuggestedMangaWidget(controller: controller),
             const Gap(16),
             CategoryTitleWidget(
               context: context,
               title: 'ALL MANGA',
               screen: MangaDiscoverWidget(
                 title: 'ALL MANGA',
-                controller: widget.controller,
+                controller: controller,
                 params: const {
                   'limit': '10',
                 },
               ),
             ),
             AllMangaWidget(
-              controller: widget.controller,
+              controller: controller,
               canLoadMore: false,
             ),
           ],

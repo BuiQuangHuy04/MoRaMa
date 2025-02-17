@@ -1,96 +1,123 @@
+import 'package:intl/intl.dart';
+import 'package:collection/collection.dart';
 import '../../core/index.dart';
 import '../../data/index.dart';
 import 'package:http/http.dart' as http;
+import 'dart:async';
 
 class MangaRepo implements Repository {
-  @override
-  Future<List<Manga>> getListManga({Map<String, dynamic>? params}) async {
+  static final MangaRepo _instance = MangaRepo._internal();
+
+  MangaRepo._internal();
+
+  factory MangaRepo() {
+    return _instance;
+  }
+
+  // Maximum number of retries
+  final int maxRetries = 3;
+
+  // Helper method to handle retries and backoff
+  Future<http.Response> _makeRequestWithRetries(
+    Uri url, {
+    int retries = 0,
+    Duration backoff = const Duration(seconds: 2),
+  }) async {
     try {
-      List<Manga> listManga = [];
-
-      Map<String, dynamic> params0 = {
-        // 'contentRating[]': ['safe'],
-        'status[]': ['completed'],
-        'includes[]': ['cover_art', 'artist', 'author'],
-      };
-
-      if (params != null) {
-        params0.addAll(params);
-        debugPrint('manga_repo: getListManga: _params: $params0');
-      }
-
-      var url = Uri.https(
-        Constants.api,
-        Constants.mangaEP,
-        params0,
-      );
-
-      debugPrint('manga_repo: getListManga url: $url');
-
       final response = await http.get(url);
 
-      if (response.statusCode == 200) {
-        final json = jsonDecode(response.body) as Map<String, dynamic>;
-        final baseMangaRes = BaseMangaResponse.fromJson(json);
-
-        final list = baseMangaRes.listManga;
-        if (list != null) {
-          listManga.addAll(list);
+      if (response.statusCode == 429) {
+        // If rate limited, check retry attempts
+        if (retries < maxRetries) {
+          await Future.delayed(backoff);
+          return _makeRequestWithRetries(
+            url,
+            retries: retries + 1,
+            backoff: backoff * 2, // Exponential backoff
+          );
+        } else {
+          throw Exception('Exceeded max retries due to rate limits');
         }
-
-        return listManga;
-      } else {
-        throw Exception('Failed to load data!');
       }
+
+      return response;
     } catch (e) {
-      debugPrint(e.toString());
-      return [];
+      debugPrint('Error during request: ${e.toString()}');
+      rethrow;
+    }
+  }
+
+  // Parameter validation helper
+  void _validateParameter(String name, String? value) {
+    if (value == null || value.isEmpty) {
+      throw ArgumentError('$name cannot be null or empty');
+    }
+  }
+
+  @override
+  Future<BaseMangaResponse> getListManga(BuildContext context,
+      {Map<String, dynamic>? params}) async {
+    Map<String, dynamic> params0 = {
+      'status[]': ['completed'],
+      'includes[]': ['cover_art', 'artist', 'author'],
+    };
+
+    if (params != null) {
+      params0.addAll(params);
+      debugPrint('manga_repo: getListManga: _params: $params0');
+    }
+
+    var url = Uri.https(
+      Constants.api,
+      Constants.mangaEP,
+      params0,
+    );
+
+    debugPrint('manga_repo: getListManga url: $url');
+
+    final response = await _makeRequestWithRetries(url);
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
+      return BaseMangaResponse.fromJson(json);
+    } else {
+      throw Exception('Failed to load manga list: ${response.body}');
     }
   }
 
   @override
   Future<String> getFileNameCover({required String mangaId}) async {
-    try {
-      String fileName = '';
+    _validateParameter('mangaId', mangaId); // Validate mangaId
 
-      Map<String, dynamic> params = {
-        'includes[]': ['cover_art', 'artist', 'author'],
-      };
+    String fileName = '';
 
-      debugPrint('manga_repo: getFileNameCover: _params: $params');
+    Map<String, dynamic> params = {
+      'includes[]': ['cover_art', 'artist', 'author'],
+    };
 
-      var url = Uri.https(
-        Constants.api,
-        Constants.mangaEP + mangaId,
-        params,
-      );
+    var url = Uri.https(
+      Constants.api,
+      Constants.mangaEP + mangaId,
+      params,
+    );
 
-      // debugPrint('manga_repo: getFileNameCover url: $url');
+    final response = await _makeRequestWithRetries(url);
 
-      final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
+      final baseCoverRes = BaseCoverRes.fromJson(json);
 
-      if (response.statusCode == 200) {
-        final json = jsonDecode(response.body) as Map<String, dynamic>;
-        final baseCoverRes = BaseCoverRes.fromJson(json);
-
-        if (baseCoverRes.cover != null) {
-          if (baseCoverRes.cover!.relationships != null) {
-            for (var relationship in baseCoverRes.cover!.relationships!) {
-              if (relationship.type == Relationship.coverArt.value) {
-                fileName = relationship.attributes!.fileName!;
-                break;
-              }
-            }
+      if (baseCoverRes.cover != null) {
+        for (var relationship in baseCoverRes.cover!.relationships!) {
+          if (relationship.type == Relationship.coverArt.value) {
+            fileName = relationship.attributes!.fileName!;
+            break;
           }
         }
-        return fileName;
-      } else {
-        return fileName;
       }
-    } catch (e) {
-      debugPrint(e.toString());
-      return '';
     }
+
+    return fileName;
   }
 
   @override
@@ -98,54 +125,81 @@ class MangaRepo implements Repository {
     required String mangaId,
     Map<String, dynamic>? params,
   }) async {
-    try {
-      List<Chapter> chapters = [];
+    _validateParameter('mangaId', mangaId); // Validate mangaId
 
-      Map<String, dynamic> params0 = {
-        'includes[]': ['scanlation_group', 'manga', 'user'],
-      };
+    List<Chapter> ungroupedChapters = [];
 
-      if (params != null) {
-        params0.addAll(params);
-        debugPrint('manga_repo: getListManga: _params: $params0');
-      }
+    Map<String, dynamic> params0 = {
+      'includes[]': ['scanlation_group', 'manga', 'user'],
+    };
 
-      var url = Uri.https(
-        Constants.api,
-        Constants.mangaEP + mangaId.toString() + Constants.chapterEP,
-        params0,
-      );
-
-      debugPrint('manga_repo: getListChapter url: $url');
-
-      final response = await http.get(url);
-
-      //https://api.mangadex.org/manga/ade0306c-f4b6-4890-9edb-1ddf04df2039/feed?includeFuturePublishAt=0
-      //https://api.mangadex.org/manga/ade0306c-f4b6-4890-9edb-1ddf04df2039/feed/%3FincludeFuturePublishAt=0
-
-      if (response.statusCode == 200) {
-        final json = jsonDecode(response.body) as Map<String, dynamic>;
-        final baseChapterRes = BaseChapterRes.fromJson(json);
-
-        if (baseChapterRes.chapters != null) {
-          chapters.addAll(baseChapterRes.chapters!);
-
-          chapters.sort(
-            (a, b) => int.parse(a.attributes!.chapter!).compareTo(
-              int.parse(b.attributes!.chapter!),
-            ),
-          );
-
-          // debugPrint('manga_repo: chapter length: ${chapters.length.toString()}');
-        }
-        return chapters;
-      } else {
-        return chapters;
-      }
-    } catch (e) {
-      debugPrint('manga_repo: getListChapter: err: ${e.toString()}');
-      return [];
+    if (params != null) {
+      params0.addAll(params);
+      debugPrint('manga_repo: getListChapter: _params: $params0');
     }
+
+    var url = Uri.https(
+      Constants.api,
+      Constants.mangaEP + mangaId + Constants.chapterEP,
+      params0,
+    );
+
+    debugPrint('manga_repo: getListChapter: url: $url');
+
+    final response = await _makeRequestWithRetries(url);
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
+      final baseChapterRes = BaseChapterRes.fromJson(json);
+
+      debugPrint('manga_repo: getListChapter: baseChapterRes: $baseChapterRes');
+
+      if (baseChapterRes.chapters != null) {
+        ungroupedChapters.addAll(baseChapterRes.chapters!);
+        try {
+          ungroupedChapters.sort((a, b) => int.parse(a.attributes!.chapter!)
+              .compareTo(int.parse(b.attributes!.chapter!)));
+        } catch (e) {
+          ungroupedChapters.sort((a, b) {
+            DateTime dateTimeA = DateFormat('dd/MM/yyyy HH:MM')
+                .parse(a.attributes!.publishAt.toString());
+            DateTime dateTimeB = DateFormat('dd/MM/yyyy HH:MM')
+                .parse(b.attributes!.publishAt.toString());
+
+            return dateTimeB.millisecondsSinceEpoch
+                .compareTo(dateTimeA.millisecondsSinceEpoch);
+          });
+        }
+      }
+    } else {
+      debugPrint(
+          'manga_repo: getListChapter: response: ${response.body.toString()}');
+    }
+
+    debugPrint(
+        'manga_repo: getListChapter: chapters length: ${ungroupedChapters.length.toString()}');
+
+    var groupedChapters = groupChaptersByRelationshipName(ungroupedChapters);
+
+    List<Chapter> chapters = [];
+
+    groupedChapters.forEach((key, value) {
+      debugPrint("Group: $key");
+      for (var chapter in value) {
+        debugPrint(" - ${chapter.attributes?.chapter}: ${chapter.attributes?.title}");
+        chapters.add(chapter);
+      }
+    });
+
+    return chapters;
+  }
+
+  Map<String, List<Chapter>> groupChaptersByRelationshipName(
+      List<Chapter> chapters) {
+    return groupBy(chapters, (Chapter chapter) {
+      // return chapter.relationships?.first.attributes?.name ?? "Unknown";
+      return chapter.attributes!.chapter ?? 'Unknown';
+    });
   }
 
   @override
@@ -153,34 +207,27 @@ class MangaRepo implements Repository {
     required String chapterId,
     Map<String, dynamic>? params,
   }) async {
-    try {
-      ChapterResource chaptersImg = ChapterResource();
+    _validateParameter('chapterId', chapterId); // Validate chapterId
 
-      var url = Uri.https(
-        Constants.api,
-        Constants.chapterMediaEP+chapterId,
-        params,
-      );
+    ChapterResource chaptersImg = ChapterResource();
 
-      // debugPrint('manga_repo: getListChapterImg url: $url');
+    var url = Uri.https(
+      Constants.api,
+      Constants.chapterMediaEP + chapterId,
+      params,
+    );
 
-      final response = await http.get(url);
+    final response = await _makeRequestWithRetries(url);
 
-      if (response.statusCode == 200) {
-        final json = jsonDecode(response.body) as Map<String, dynamic>;
-        final chapterImgRes = ChapterResourceBaseRes.fromJson(json);
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
+      final chapterImgRes = ChapterResourceBaseRes.fromJson(json);
 
-        if (chapterImgRes.chapter != null) {
-          if (chapterImgRes.chapter!.data != null) {
-            chaptersImg = chapterImgRes.chapter!;
-          }
-        }
+      if (chapterImgRes.chapter != null) {
+        chaptersImg = chapterImgRes.chapter!;
       }
-      debugPrint(chaptersImg.data!.length.toString());
-      return chaptersImg;
-    } catch (e) {
-      debugPrint('manga_repo: getListChapterImg: err: ${e.toString()}');
-      return ChapterResource();
     }
+
+    return chaptersImg;
   }
 }

@@ -25,7 +25,7 @@ class _ChapterDetailPageState extends State<ChapterDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chapter ${widget.chapter}'),
+        title: Text(widget.chapter),
       ),
       body: FutureBuilder<ChapterResource>(
         future: widget.controller.fetchListChapterImg(

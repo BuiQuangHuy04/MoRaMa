@@ -8,6 +8,11 @@ class BaseChapterRes {
   int? offset;
   int? total;
 
+  @override
+  String toString() {
+    return 'BaseChapterRes{result: $result, response: $response, chapters: $chapters, limit: $limit, offset: $offset, total: $total}';
+  }
+
   BaseChapterRes({
     this.result,
     this.response,
@@ -50,6 +55,11 @@ class Chapter {
   String? type;
   ChapterAttributes? attributes;
   List<ChapterRelationships>? relationships;
+
+  @override
+  String toString() {
+    return 'Chapter{id: $id, type: $type, attributes: $attributes, relationships: $relationships}';
+  }
 
   Chapter({
     this.id,
@@ -114,6 +124,11 @@ class ChapterAttributes {
     this.version,
   });
 
+  @override
+  String toString() {
+    return 'ChapterAttributes{chapter: $chapter, title: $title, translatedLanguage: $translatedLanguage, publishAt: $publishAt, readableAt: $readableAt, createdAt: $createdAt, updatedAt: $updatedAt, pages: $pages, version: $version}';
+  }
+
   ChapterAttributes.fromJson(Map<String, dynamic> json) {
     // volume = json['volume'];
     chapter = json['chapter'].toString().split('.')[0];
@@ -148,21 +163,148 @@ class ChapterAttributes {
 class ChapterRelationships {
   String? id;
   String? type;
+  ChapterRelationshipAttributes? attributes;
 
   ChapterRelationships({
     this.id,
     this.type,
+    this.attributes,
   });
 
   ChapterRelationships.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     type = json['type'];
+    attributes = ChapterRelationshipAttributes.fromJson(json['attributes']);
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['type'] = type;
+    data['attributes'] = attributes;
     return data;
+  }
+
+  @override
+  String toString() {
+    return 'ChapterRelationships{id: $id, type: $type, attributes: $attributes}';
+  }
+}
+
+class ChapterRelationshipAttributes {
+  String? name;
+  List<String>? altNames;
+  bool? locked;
+  String? website;
+  String? ircServer;
+  String? ircChannel;
+  String? discord;
+  String? contactEmail;
+  String? description;
+  String? twitter;
+  String? mangaUpdates;
+  List<String>? focusedLanguages;
+  bool? official;
+  bool? verified;
+  bool? inactive;
+  String? publishDelay;
+  String? createdAt;
+  String? updatedAt;
+  int? version;
+  String? username;
+  List<String>? roles;
+
+  ChapterRelationshipAttributes({
+    this.name,
+    this.altNames,
+    this.locked,
+    this.website,
+    this.ircServer,
+    this.ircChannel,
+    this.discord,
+    this.contactEmail,
+    this.description,
+    this.twitter,
+    this.mangaUpdates,
+    this.focusedLanguages,
+    this.official,
+    this.verified,
+    this.inactive,
+    this.publishDelay,
+    this.createdAt,
+    this.updatedAt,
+    this.version,
+    this.username,
+    this.roles,
+  });
+
+  ChapterRelationshipAttributes.fromJson(Map<String, dynamic> json) {
+    name = json['name'];
+    // if (json['altNames'] != null) {
+    //   altNames = <String>[];
+    //   json['altNames'].forEach((v) {
+    //     altNames!.add(v.toString());
+    //   });
+    // }
+    // locked = json['locked'];
+    // website = json['website'];
+    // ircServer = json['ircServer'];
+    // ircChannel = json['ircChannel'];
+    // discord = json['discord'];
+    // contactEmail = json['contactEmail'];
+    // description = json['description'];
+    // twitter = json['twitter'];
+    // mangaUpdates = json['mangaUpdates'];
+    // if (json['focusedLanguages'] != null) {
+    //   focusedLanguages = <String>[];
+    //   json['focusedLanguages'].forEach((v) {
+    //     focusedLanguages!.add(v.toString());
+    //   });
+    // }
+    // official = json['official'];
+    // verified = json['verified'];
+    // inactive = json['inactive'];
+    publishDelay = json['publishDelay'];
+    createdAt = json['createdAt'];
+    updatedAt = json['updatedAt'];
+    // version = json['version'];
+    username = json['username'];
+    if (json['roles'] != null) {
+      roles = <String>[];
+      json['roles'].forEach((v) {
+        roles!.add(v.toString());
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    data['altNames'] = altNames!;
+    data['locked'] = locked;
+    data['website'] = website;
+    data['ircServer'] = ircServer;
+    data['ircChannel'] = ircChannel;
+    data['discord'] = discord;
+    data['contactEmail'] = contactEmail;
+    data['description'] = description;
+    data['twitter'] = twitter;
+    data['mangaUpdates'] = mangaUpdates;
+    data['focusedLanguages'] = focusedLanguages;
+    data['official'] = official;
+    data['verified'] = verified;
+    data['inactive'] = inactive;
+    data['publishDelay'] = publishDelay;
+    data['createdAt'] = createdAt;
+    data['updatedAt'] = updatedAt;
+    data['version'] = version;
+    data['username'] = username;
+    data['roles'] = roles;
+    return data;
+  }
+
+  @override
+  String toString() {
+    return 'ChapterRelationshipAttributes{name: $name, locked: $locked, discord: $discord, description: $description, twitter: $twitter, mangaUpdates: $mangaUpdates, official: $official, verified: $verified, inactive: $inactive, createdAt: $createdAt, updatedAt: $updatedAt, version: $version}';
   }
 }

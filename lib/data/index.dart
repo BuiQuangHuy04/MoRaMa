@@ -21,3 +21,4 @@ export 'res/manga_repo.dart';
 export 'res/repo.dart';
 
 export 'providers/manga_provider.dart';
+export 'providers/home_provider.dart';

@@ -26,7 +26,9 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
         slivers: [
           SliverAppBar(
             expandedHeight: 600,
-            title: Text(widget.manga.attributes!.title!.en!),
+            title: Text(widget.manga.attributes!.title!.en != null
+                ? widget.manga.attributes!.title!.en.toString()
+                : widget.manga.attributes!.title!.ja.toString()),
             titleTextStyle: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 24,
@@ -143,6 +145,7 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
                             );
                           } else if (snapshot.hasData) {
                             final chapters = snapshot.data;
+                            debugPrint('manga_detail_page: 148: $chapters');
                             if (chapters!.isNotEmpty) {
                               return ListView.builder(
                                 physics: const NeverScrollableScrollPhysics(),
@@ -157,8 +160,22 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
                                         MaterialPageRoute(
                                           builder: (_) {
                                             return ChapterDetailPage(
-                                              mangaTitle: widget.manga.attributes!.title!.en.toString(),
-                                              chapter: chapters[index].attributes!.chapter.toString(),
+                                              mangaTitle: widget
+                                                  .manga.attributes!.title!.en
+                                                  .toString(),
+                                              chapter: chapters.length < 2
+                                                  ? chapters[index]
+                                                              .attributes!
+                                                              .chapter ==
+                                                          'null'
+                                                      ? 'One Shot'
+                                                      : 'Chapter ${chapters[index].attributes!.chapter} '
+                                                  : chapters[index]
+                                                              .attributes!
+                                                              .chapter ==
+                                                          'null'
+                                                      ? 'Chapter 1'
+                                                      : 'Chapter ${chapters[index].attributes!.chapter} ',
                                               chapterId: chapters[index].id!,
                                               controller: widget.controller,
                                             );
@@ -169,14 +186,70 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
                                     child: Row(
                                       children: [
                                         Text(
-                                          '[${chapters[index].attributes!.translatedLanguage}]'
-                                          ' Chapter ${chapters[index].attributes!.chapter} ',
+                                          '[${chapters[index].attributes!.translatedLanguage}] ',
                                           style: const TextStyle(
                                             color: Colors.black,
                                             fontWeight: FontWeight.normal,
                                             fontSize: 18,
                                           ),
                                         ),
+                                        Text(
+                                          chapters.length < 2
+                                              ? chapters[index]
+                                                          .attributes!
+                                                          .chapter ==
+                                                      'null'
+                                                  ? 'One Shot'
+                                                  : 'Chapter ${chapters[index].attributes!.chapter} '
+                                              : chapters[index]
+                                                          .attributes!
+                                                          .chapter ==
+                                                      'null'
+                                                  ? 'Chapter 1'
+                                                  : 'Chapter ${chapters[index].attributes!.chapter} ',
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.normal,
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                        chapters[index]
+                                                .relationships!
+                                                .any((relationship) {
+                                          return relationship.type! ==
+                                                  'scanlation_group' &&
+                                              relationship.attributes != null;
+                                        })
+                                            ? Expanded(
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                children: [
+                                                  Text(
+                                                      chapters[index]
+                                                          .relationships!
+                                                          .firstWhere((relationship) {
+                                                            return relationship
+                                                                        .type! ==
+                                                                    'scanlation_group' &&
+                                                                relationship
+                                                                        .attributes !=
+                                                                    null;
+                                                          })
+                                                          .attributes!
+                                                          .name
+                                                          .toString(),
+                                                      style: const TextStyle(
+                                                        color: Colors.grey,
+                                                        fontWeight: FontWeight.normal,
+                                                        fontSize: 14,
+                                                        overflow: TextOverflow.clip,
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                            )
+                                            : const Text(''),
                                       ],
                                     ),
                                   );
@@ -184,7 +257,7 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
                               );
                             } else {
                               return const Center(
-                                child: Text('Have not any chapters yet!'),
+                                child: Text('Have not any chapters yet!!'),
                               );
                             }
                           } else {
