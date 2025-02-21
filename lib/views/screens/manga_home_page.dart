@@ -1,5 +1,6 @@
 import '../../core/index.dart';
 import '../../data/index.dart';
+import 'bookmark_page/manga_bookmark_widget.dart';
 import 'home_page/manga_home_widget.dart';
 import 'discover_page/manga_discover_widget.dart';
 
@@ -23,10 +24,10 @@ class _MangaHomePageState extends State<MangaHomePage> {
       icon: Icon(Icons.explore_outlined),
       label: "Discover",
     ),
-    // BottomNavigationBarItem(
-    //   icon: Icon(Icons.bookmark_border),
-    //   label: "Bookmark",
-    // ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.bookmark_border),
+      label: "Bookmark",
+    ),
     // BottomNavigationBarItem(
     //   icon: Icon(Icons.person_outline_outlined),
     //   label: "Profile",
@@ -50,7 +51,9 @@ class _MangaHomePageState extends State<MangaHomePage> {
           'limit': '10',
         },
       ),
-      // MangaBookmarkWidget(),
+      MangaBookmarkWidget(
+        controller: _controller,
+      ),
       // MangaProfileWidget(),
     ];
 
@@ -74,8 +77,8 @@ class _MangaHomePageState extends State<MangaHomePage> {
           context,
           MangaKey.SUGGESTED.key,
           params: {
-            // "status[]": ["completed"],
-            // 'contentRating[]': ['suggestive']
+            "status[]": ["completed"],
+            'contentRating[]': ['suggestive']
           },
         );
       }

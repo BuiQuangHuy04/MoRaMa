@@ -19,6 +19,22 @@ class MangaDetailPage extends StatefulWidget {
 }
 
 class _MangaDetailPageState extends State<MangaDetailPage> {
+  bool _isFavorite = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkStatus();
+  }
+
+  bool _checkStatus() {
+    return _isFavorite;
+  }
+
+  void _updateStatus() {
+    _isFavorite = !_isFavorite;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,12 +56,43 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
               background: LoadingMangaCover(
                 manga: widget.manga,
                 coverUrl: widget.coverUrl,
+                controller: widget.controller,
               ),
             ),
             actions: [
               IconButton(
-                icon: const Icon(Icons.favorite_border),
-                onPressed: () {},
+                icon: Consumer<MangaProvider>(
+                  builder: (context, favoriteProvider, child) {
+                    bool isFavorite = favoriteProvider.isFavorite(widget.manga);
+                    return Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border);
+                  },
+                ),
+                onPressed: () {
+                  final provider = Provider.of<MangaProvider>(
+                    context,
+                    listen: false,
+                  );
+                  final isFavorite = provider.isFavorite(widget.manga);
+
+                  provider.toggleFavorite(widget.manga);
+
+                  debugPrint('manga_detail_page: favorite mangas: '
+                      '${provider.favoriteMangas.length}');
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        isFavorite
+                            ? "Removed from favorites"
+                            : "Added to favorites",
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      duration: const Duration(seconds: 2),
+                      backgroundColor: isFavorite ? Colors.grey : Colors.amber,
+                    ),
+                  );
+                },
               ),
             ],
           ),
@@ -221,14 +268,17 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
                                               relationship.attributes != null;
                                         })
                                             ? Expanded(
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.max,
-                                                mainAxisAlignment: MainAxisAlignment.end,
-                                                children: [
-                                                  Text(
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  children: [
+                                                    Text(
                                                       chapters[index]
                                                           .relationships!
-                                                          .firstWhere((relationship) {
+                                                          .firstWhere(
+                                                              (relationship) {
                                                             return relationship
                                                                         .type! ==
                                                                     'scanlation_group' &&
@@ -241,14 +291,16 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
                                                           .toString(),
                                                       style: const TextStyle(
                                                         color: Colors.grey,
-                                                        fontWeight: FontWeight.normal,
+                                                        fontWeight:
+                                                            FontWeight.normal,
                                                         fontSize: 14,
-                                                        overflow: TextOverflow.clip,
+                                                        overflow:
+                                                            TextOverflow.clip,
                                                       ),
                                                     ),
-                                                ],
-                                              ),
-                                            )
+                                                  ],
+                                                ),
+                                              )
                                             : const Text(''),
                                       ],
                                     ),

@@ -1,3 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart';
+
 import '/views/index.dart';
 import '/data/index.dart';
 import '/core/index.dart';
@@ -11,7 +13,7 @@ class LoadingMangaCover extends StatefulWidget {
 
   const LoadingMangaCover({
     super.key,
-    this.controller,
+    required this.controller,
     required this.manga,
     this.coverUrl,
     this.width,
@@ -78,14 +80,14 @@ class _LoadingMangaCoverState extends State<LoadingMangaCover> {
                   borderRadius: BorderRadius.circular(12),
                   image: DecorationImage(
                     filterQuality: FilterQuality.high,
-                    image: NetworkImage(
+                    image: CachedNetworkImageProvider(
                       coverUrl,
-                      headers: {
-                        'Connection': 'Keep-Alive',
-                        'Keep-Alive': 'timeout=5, max=1000'
+                      errorListener: (e) {
+                        debugPrint('Loading cover image error: $e');
                       },
+                      cacheManager: CachedNetworkImageProvider.defaultCacheManager,
                     ),
-                    fit: BoxFit.cover,
+                    fit: BoxFit.fill,
                   ),
                 ),
               ),

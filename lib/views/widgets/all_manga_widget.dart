@@ -19,9 +19,11 @@ class AllMangaWidget extends StatefulWidget {
 }
 
 class _AllMangaWidgetState extends State<AllMangaWidget> {
+
   @override
   Widget build(BuildContext context) {
     debugPrint('all_manga_widget: build');
+    debugPrint('all_manga_widget: params: ${widget.params}');
     return Consumer<MangaProvider>(
       builder: (context, provider, child) {
         final isLoading = provider.isLoading[MangaKey.ALL.key] ?? false;
@@ -43,17 +45,20 @@ class _AllMangaWidgetState extends State<AllMangaWidget> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: GridView.builder(
                   shrinkWrap: true,
-                  itemCount: mangaList.length,
+                  itemCount: (provider.curPage + 1) * 10 < mangaList.length ||
+                          mangaList.length % 10 == 0
+                      ? 10
+                      : mangaList.length % 10,
                   physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
                     childAspectRatio: 0.8,
                   ),
                   itemBuilder: (context, index) {
-                    var manga = mangaList.elementAt(index);
+                    var manga =
+                        mangaList.elementAt(index + 10 * provider.curPage);
 
                     return LoadingMangaCover(
                       controller: widget.controller,
@@ -63,64 +68,90 @@ class _AllMangaWidgetState extends State<AllMangaWidget> {
                   },
                 ),
               ),
-              // widget.canLoadMore
-              //     ? Positioned(
-              //         bottom: 10,
-              //         right: 10,
-              //         child: Column(
-              //           children: [
-              //             ElevatedButton.icon(
-              //               onPressed: provider.nextOffset(param: widget.params),
-              //               icon: const Icon(
-              //                 Icons.chevron_right_outlined,
-              //                 color: Colors.white,
-              //               ),
-              //               label: Text(
-              //                 '${provider.curPage + 2}',
-              //                 style: const TextStyle(
-              //                   color: Colors.white,
-              //                 ),
-              //               ),
-              //               style: ElevatedButton.styleFrom(
-              //                 backgroundColor: Colors.amberAccent,
-              //                 shape: RoundedRectangleBorder(
-              //                   borderRadius: BorderRadius.circular(20),
-              //                 ),
-              //                 padding: const EdgeInsets.symmetric(
-              //                   horizontal: 16,
-              //                   vertical: 10,
-              //                 ),
-              //               ),
-              //             ),
-              //             const SizedBox(height: 8),
-              //             if (provider.curPage >= 1)
-              //               ElevatedButton.icon(
-              //                 onPressed: provider.preOffset(param: widget.params),
-              //                 icon: const Icon(
-              //                   Icons.chevron_left_outlined,
-              //                   color: Colors.white,
-              //                 ),
-              //                 label: Text(
-              //                   '${provider.curPage}',
-              //                   style: const TextStyle(
-              //                     color: Colors.white,
-              //                   ),
-              //                 ),
-              //                 style: ElevatedButton.styleFrom(
-              //                   backgroundColor: Colors.amberAccent,
-              //                   shape: RoundedRectangleBorder(
-              //                     borderRadius: BorderRadius.circular(20),
-              //                   ),
-              //                   padding: const EdgeInsets.symmetric(
-              //                     horizontal: 16,
-              //                     vertical: 10,
-              //                   ),
-              //                 ),
-              //               ),
-              //           ],
-              //         ),
-              //       )
-              //     : Container(),
+              if (widget.canLoadMore)
+                Positioned(
+                  right: 10,
+                  left: 10,
+                  bottom: 10,
+                  child: SizedBox(
+                    width: MediaQuery.sizeOf(context).width,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        provider.curPage >= 1
+                            ? ElevatedButton.icon(
+                                onPressed: () {
+                                  provider.preOffset(param: widget.params);
+                                },
+                                icon: const Icon(
+                                  Icons.chevron_left_outlined,
+                                  color: Colors.white,
+                                ),
+                                label: Text(
+                                  '${provider.curPage}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 10,
+                                  ),
+                                ),
+                              )
+                            : Container(),
+                        mangaList.length % 10 >= 0 &&
+                                provider.curPage * 10 + mangaList.length % 10 <
+                                    mangaList.length
+                            ? ElevatedButton.icon(
+                                onPressed: () {
+                                  provider.nextOffset(param: widget.params);
+
+                                  if ((provider
+                                              .manga[MangaKey.ALL.key]!.length /
+                                          10 ==
+                                      provider.curPage)) {
+                                    provider.fetchMangaList(
+                                      context,
+                                      MangaKey.ALL.key,
+                                      params: provider.discoverParam,
+                                    );
+                                  }
+                                },
+                                icon: const Icon(
+                                  Icons.chevron_right_outlined,
+                                  color: Colors.white,
+                                ),
+                                label: Text(
+                                  '${provider.curPage + 2}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 10,
+                                  ),
+                                ),
+                              )
+                            : Container(),
+                      ],
+                    ),
+                  ),
+                )
+              else
+                Container(),
             ],
           );
         } else {

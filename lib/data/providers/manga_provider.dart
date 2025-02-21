@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import '/data/index.dart';
 import '/core/index.dart';
 
@@ -82,14 +84,20 @@ class MangaProvider with ChangeNotifier, DiagnosticableTreeMixin {
   Map<String, String> curFilter = <String, String>{};
 
   void updateFilter(String filter) {
-
-
     if (curFilter.keys.isNotEmpty) {
       if (filter != curFilter.keys.first) {
         manga[MangaKey.ALL.key]!.clear();
+
+        curOffset = 0;
+        curPage = 0;
+        discoverParam = {};
       }
     } else {
       manga[MangaKey.ALL.key]!.clear();
+
+      curOffset = 0;
+      curPage = 0;
+      discoverParam = {};
     }
 
     var tempFilter = convertFilterStr(filter);
@@ -136,7 +144,7 @@ class MangaProvider with ChangeNotifier, DiagnosticableTreeMixin {
     }
   }
 
-  VoidCallback? nextOffset({Map<String, dynamic>? param}) {
+  void nextOffset({Map<String, dynamic>? param}) {
     curPage += 1;
     curOffset = curPage * 10;
     if (discoverParam.containsKey('offset')) {
@@ -149,10 +157,9 @@ class MangaProvider with ChangeNotifier, DiagnosticableTreeMixin {
     }
 
     listeners();
-    return null;
   }
 
-  VoidCallback? preOffset({Map<String, dynamic>? param}) {
+  void preOffset({Map<String, dynamic>? param}) {
     curPage -= 1;
     curOffset = curPage * 10;
     discoverParam.update('offset', (value) => curOffset.toString());
@@ -160,7 +167,6 @@ class MangaProvider with ChangeNotifier, DiagnosticableTreeMixin {
       discoverParam.addAll(param);
     }
     listeners();
-    return null;
   }
 
   //refresh
@@ -168,5 +174,23 @@ class MangaProvider with ChangeNotifier, DiagnosticableTreeMixin {
     total = 0;
     curFilter = <String, String>{};
     listeners();
+  }
+
+  //manga favorite
+  final List<Manga> _favoriteMangas = [];
+
+  List<Manga> get favoriteMangas => _favoriteMangas;
+
+  void toggleFavorite(Manga manga) {
+    if (_favoriteMangas.contains(manga)) {
+      _favoriteMangas.remove(manga);
+    } else {
+      _favoriteMangas.add(manga);
+    }
+    notifyListeners();
+  }
+
+  bool isFavorite(Manga manga) {
+    return _favoriteMangas.contains(manga);
   }
 }

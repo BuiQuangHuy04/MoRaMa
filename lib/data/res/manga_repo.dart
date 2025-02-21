@@ -60,6 +60,7 @@ class MangaRepo implements Repository {
     Map<String, dynamic> params0 = {
       'status[]': ['completed'],
       'includes[]': ['cover_art', 'artist', 'author'],
+      // 'limit':'20',
     };
 
     if (params != null) {
@@ -100,6 +101,8 @@ class MangaRepo implements Repository {
       Constants.mangaEP + mangaId,
       params,
     );
+
+    debugPrint('manga_repo: getFileNameCover: url: $url');
 
     final response = await _makeRequestWithRetries(url);
 
@@ -152,7 +155,7 @@ class MangaRepo implements Repository {
       final json = jsonDecode(response.body) as Map<String, dynamic>;
       final baseChapterRes = BaseChapterRes.fromJson(json);
 
-      debugPrint('manga_repo: getListChapter: baseChapterRes: $baseChapterRes');
+      // debugPrint('manga_repo: getListChapter: baseChapterRes: $baseChapterRes');
 
       if (baseChapterRes.chapters != null) {
         ungroupedChapters.addAll(baseChapterRes.chapters!);
@@ -186,7 +189,7 @@ class MangaRepo implements Repository {
     groupedChapters.forEach((key, value) {
       debugPrint("Group: $key");
       for (var chapter in value) {
-        debugPrint(" - ${chapter.attributes?.chapter}: ${chapter.attributes?.title}");
+        // debugPrint(" - ${chapter.attributes?.chapter}: ${chapter.attributes?.title}");
         chapters.add(chapter);
       }
     });

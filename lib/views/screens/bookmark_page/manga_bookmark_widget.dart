@@ -1,7 +1,16 @@
-import 'package:flutter/material.dart';
+import 'package:morama/views/screens/bookmark_page/favorite_container.dart';
+
+import '/core/index.dart';
+import '/data/index.dart';
+import '../../index.dart';
 
 class MangaBookmarkWidget extends StatefulWidget {
-  const MangaBookmarkWidget({super.key});
+  final MangaController controller;
+
+  const MangaBookmarkWidget({
+    super.key,
+    required this.controller,
+  });
 
   @override
   State<MangaBookmarkWidget> createState() => _MangaBookmarkWidgetState();
@@ -18,9 +27,38 @@ class _MangaBookmarkWidgetState extends State<MangaBookmarkWidget> {
         elevation: 0,
         title: const Text("BOOKMARK"),
         centerTitle: true,
-        actions: [],
       ),
-      body: const Center(child: Text('On Development'),),
+      body: Consumer<MangaProvider>(
+        builder: (context, provider, child) {
+          final favoriteMangas = provider.favoriteMangas;
+
+          debugPrint(
+              'manga_bookmark_widget: favorite mangas: ${favoriteMangas.length}');
+
+          if (favoriteMangas.isEmpty) {
+            return const Center(
+              child: Text(
+                'No favorite mangas yet!',
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+            );
+          }
+
+          return ListView.builder(
+            itemCount: favoriteMangas.length,
+            itemBuilder: (context, index) {
+              final manga = favoriteMangas[index];
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: FavoriteContainer(
+                  controller: widget.controller,
+                  manga: manga,
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

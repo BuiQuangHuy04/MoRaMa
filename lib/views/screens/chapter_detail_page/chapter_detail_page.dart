@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:morama/data/index.dart';
 
 import '../../../core/index.dart';
@@ -44,7 +45,6 @@ class _ChapterDetailPageState extends State<ChapterDetailPage> {
               return ListView.builder(
                 itemCount: imageUrls.length,
                 itemBuilder: (context, index) {
-
                   return Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
@@ -58,19 +58,12 @@ class _ChapterDetailPageState extends State<ChapterDetailPage> {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
-                        'https://uploads.mangadex.org/data-saver/${chapterRes.hash!}/${imageUrls[index]}',
+                      child: CachedNetworkImage(
+                        imageUrl:
+                            'https://uploads.mangadex.org/data-saver/${chapterRes.hash!}/${imageUrls[index]}',
                         fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return const Center(
-                              child: CircularProgressIndicator());
-                        },
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Center(
-                            child: Text('Image not available'),
-                          );
-                        },
+                        filterQuality: FilterQuality.high,
+                        fadeInDuration: Duration.zero,
                       ),
                     ),
                   );
