@@ -8,6 +8,7 @@ class MangaDiscoverWidget extends StatefulWidget {
   final Map<String, dynamic>? params;
   final MangaController controller;
   final String title;
+  final MangaKey mangaKey;
   final bool hasFilter;
 
   const MangaDiscoverWidget({
@@ -15,6 +16,7 @@ class MangaDiscoverWidget extends StatefulWidget {
     this.params,
     required this.controller,
     required this.title,
+    required this.mangaKey,
     this.hasFilter = true,
   });
 
@@ -48,11 +50,11 @@ class _MangaDiscoverWidgetState extends State<MangaDiscoverWidget> {
 
     var provider = Provider.of<MangaProvider>(context, listen: false);
 
-    if (provider.manga[MangaKey.ALL.key] != null) {
-      provider.manga[MangaKey.ALL.key]!.clear();
+    if (provider.manga[widget.mangaKey.key] != null) {
+      provider.manga[widget.mangaKey.key]!.clear();
 
-      provider.curPage = 0;
-      provider.curOffset = 0;
+      provider.curPage[widget.mangaKey.key] = 0;
+      provider.curOffset[widget.mangaKey.key] = 0;
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -60,7 +62,7 @@ class _MangaDiscoverWidgetState extends State<MangaDiscoverWidget> {
         if (mounted) {
           provider.fetchMangaList(
             context,
-            MangaKey.ALL.key,
+            widget.mangaKey,
             params: _params,
           );
         }
@@ -110,7 +112,10 @@ class _MangaDiscoverWidgetState extends State<MangaDiscoverWidget> {
                               if (provider.curFilter.isEmpty ||
                                   provider.curFilter.keys.first !=
                                       filter[index]) {
-                                provider.updateFilter(filter[index]);
+                                provider.updateFilter(
+                                  filter[index],
+                                  widget.mangaKey,
+                                );
 
                                 if (widget.params != null) {
                                   _params.addAll(widget.params!);
@@ -143,8 +148,9 @@ class _MangaDiscoverWidgetState extends State<MangaDiscoverWidget> {
                                 provider.updateDiscoverParam(_params);
                                 provider.fetchMangaList(
                                   context,
-                                  MangaKey.ALL.key,
-                                  params: provider.discoverParam,
+                                  widget.mangaKey,
+                                  params: provider
+                                      .discoverParam[widget.mangaKey.key],
                                 );
                               }
                             },
@@ -183,7 +189,7 @@ class _MangaDiscoverWidgetState extends State<MangaDiscoverWidget> {
                 child: Row(
                   children: [
                     Text(
-                      '${provider.total} mangas',
+                      '${provider.total[widget.mangaKey.key]} mangas',
                       style: const TextStyle(
                         color: Colors.white,
                       ),
@@ -203,6 +209,8 @@ class _MangaDiscoverWidgetState extends State<MangaDiscoverWidget> {
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: AllMangaWidget(
+                  key: widget.key,
+                  mangaKey: widget.mangaKey,
                   controller: widget.controller,
                   params: _params,
                   canLoadMore: true,

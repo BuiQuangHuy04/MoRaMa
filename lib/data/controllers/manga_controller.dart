@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 
 import '../index.dart';
 
@@ -11,6 +12,10 @@ class MangaController {
 
   Future<Object> mockFetch(dynamic object) {
     return Future.delayed(Duration.zero, () => object);
+  }
+
+  Future<Manga> fetchManga(String id) {
+    return _repo.getManga(id);
   }
 
   Future<BaseMangaResponse> fetchListManga(BuildContext context,

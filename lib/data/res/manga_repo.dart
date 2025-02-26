@@ -55,6 +55,34 @@ class MangaRepo implements Repository {
   }
 
   @override
+  Future<Manga> getManga(
+    String id,
+  ) async {
+    var url = Uri.https(
+      Constants.api,
+      Constants.mangaEP + id,
+      {
+        'includes[]': [
+          'cover_art',
+          'artist',
+          'author',
+        ],
+      },
+    );
+
+    debugPrint('manga_repo: getManga url: $url');
+
+    final response = await _makeRequestWithRetries(url);
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
+      return Manga.fromJson(json['data']);
+    } else {
+      throw Exception('Failed to load manga list: ${response.body}');
+    }
+  }
+
+  @override
   Future<BaseMangaResponse> getListManga(BuildContext context,
       {Map<String, dynamic>? params}) async {
     Map<String, dynamic> params0 = {
@@ -102,7 +130,7 @@ class MangaRepo implements Repository {
       params,
     );
 
-    debugPrint('manga_repo: getFileNameCover: url: $url');
+    // debugPrint('manga_repo: getFileNameCover: url: $url');
 
     final response = await _makeRequestWithRetries(url);
 

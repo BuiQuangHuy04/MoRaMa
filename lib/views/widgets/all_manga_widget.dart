@@ -6,9 +6,11 @@ class AllMangaWidget extends StatefulWidget {
   final MangaController controller;
   final Map<String, dynamic>? params;
   final bool canLoadMore;
+  final MangaKey mangaKey;
 
   const AllMangaWidget({
     super.key,
+    required this.mangaKey,
     required this.controller,
     required this.canLoadMore,
     this.params,
@@ -19,25 +21,27 @@ class AllMangaWidget extends StatefulWidget {
 }
 
 class _AllMangaWidgetState extends State<AllMangaWidget> {
-
   @override
   Widget build(BuildContext context) {
     debugPrint('all_manga_widget: build');
     debugPrint('all_manga_widget: params: ${widget.params}');
     return Consumer<MangaProvider>(
       builder: (context, provider, child) {
-        final isLoading = provider.isLoading[MangaKey.ALL.key] ?? false;
-        final error = provider.error[MangaKey.ALL.key];
-        final mangaList = provider.manga[MangaKey.ALL.key] ?? [];
+        final isLoading = provider.isLoading[widget.mangaKey.key] ?? false;
+        final error = provider.error[widget.mangaKey.key];
+        List<Manga> mangaList = provider.manga[widget.mangaKey.key] ?? [];
+
+        debugPrint(
+            'all_manga_widget: mangaList in ${widget.mangaKey.key}: ${mangaList.length}');
 
         if (isLoading) {
           return const LoadingWidget();
         } else if (error != null) {
           return Center(
-            child: Text('Error: ${provider.error[MangaKey.ALL.key]}'),
+            child: Text('Error: ${provider.error[widget.mangaKey.key]}'),
           );
         } else if (mangaList.isNotEmpty) {
-          var mangaList = provider.manga[MangaKey.ALL.key]!;
+          var mangaList = provider.manga[widget.mangaKey.key]!;
 
           return Stack(
             children: [
@@ -45,7 +49,8 @@ class _AllMangaWidgetState extends State<AllMangaWidget> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: GridView.builder(
                   shrinkWrap: true,
-                  itemCount: (provider.curPage + 1) * 10 < mangaList.length ||
+                  itemCount: (provider.curPage[widget.mangaKey.key]! + 1) * 10 <
+                              mangaList.length ||
                           mangaList.length % 10 == 0
                       ? 10
                       : mangaList.length % 10,
@@ -57,8 +62,8 @@ class _AllMangaWidgetState extends State<AllMangaWidget> {
                     childAspectRatio: 0.8,
                   ),
                   itemBuilder: (context, index) {
-                    var manga =
-                        mangaList.elementAt(index + 10 * provider.curPage);
+                    var manga = mangaList.elementAt(
+                        index + 10 * provider.curPage[widget.mangaKey.key]!);
 
                     return LoadingMangaCover(
                       controller: widget.controller,
@@ -79,17 +84,20 @@ class _AllMangaWidgetState extends State<AllMangaWidget> {
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        provider.curPage >= 1
+                        provider.curPage[widget.mangaKey.key]! >= 1
                             ? ElevatedButton.icon(
                                 onPressed: () {
-                                  provider.preOffset(param: widget.params);
+                                  provider.preOffset(
+                                    widget.mangaKey,
+                                    param: widget.params,
+                                  );
                                 },
                                 icon: const Icon(
                                   Icons.chevron_left_outlined,
                                   color: Colors.white,
                                 ),
                                 label: Text(
-                                  '${provider.curPage}',
+                                  '${provider.curPage[widget.mangaKey.key]}',
                                   style: const TextStyle(
                                     color: Colors.white,
                                   ),
@@ -107,20 +115,26 @@ class _AllMangaWidgetState extends State<AllMangaWidget> {
                               )
                             : Container(),
                         mangaList.length % 10 >= 0 &&
-                                provider.curPage * 10 + mangaList.length % 10 <
-                                    mangaList.length
+                                provider.curPage[widget.mangaKey.key]! * 10 +
+                                        mangaList.length % 10 <
+                                    mangaList.length &&
+                                mangaList.length + 10 <=
+                                    provider.total[widget.mangaKey.key]!
                             ? ElevatedButton.icon(
                                 onPressed: () {
-                                  provider.nextOffset(param: widget.params);
-
-                                  if ((provider
-                                              .manga[MangaKey.ALL.key]!.length /
+                                  provider.nextOffset(
+                                    widget.mangaKey,
+                                    param: widget.params,
+                                  );
+                                  if ((provider.manga[widget.mangaKey.key]!
+                                              .length /
                                           10 ==
-                                      provider.curPage)) {
+                                      provider.curPage[widget.mangaKey.key])) {
                                     provider.fetchMangaList(
                                       context,
-                                      MangaKey.ALL.key,
-                                      params: provider.discoverParam,
+                                      widget.mangaKey,
+                                      params: provider
+                                          .discoverParam[widget.mangaKey.key],
                                     );
                                   }
                                 },
@@ -129,7 +143,7 @@ class _AllMangaWidgetState extends State<AllMangaWidget> {
                                   color: Colors.white,
                                 ),
                                 label: Text(
-                                  '${provider.curPage + 2}',
+                                  '${provider.curPage[widget.mangaKey.key]! + 2}',
                                   style: const TextStyle(
                                     color: Colors.white,
                                   ),

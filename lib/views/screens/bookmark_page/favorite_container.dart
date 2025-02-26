@@ -73,7 +73,7 @@ class FavoriteContainer extends StatelessWidget {
                       ),
                       Gap(12),
                       Text(
-                        "20 min left",
+                        "20 chapters left",
                         style: TextStyle(
                           color: Colors.white,
                         ),
@@ -85,7 +85,7 @@ class FavoriteContainer extends StatelessWidget {
                     value: .7,
                     color: Colors.amberAccent,
                   ),
-                  const Gap(10),
+                  // const Gap(10),
                   // Container(
                   //   padding: const EdgeInsets.symmetric(vertical: 8),
                   //   height: 50,

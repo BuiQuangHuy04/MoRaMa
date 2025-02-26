@@ -12,3 +12,4 @@ export '/views/widgets/suggested_manga_widget.dart';
 export '/views/widgets/all_manga_widget.dart';
 export '/views/widgets/category_title_widget.dart';
 export '/views/widgets/loading_manga_cover.dart';
+export '/views/screens/bookmark_page/favorite_container.dart';

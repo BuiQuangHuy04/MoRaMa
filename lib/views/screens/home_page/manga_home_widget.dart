@@ -58,6 +58,7 @@ class _MangaHomeWidgetState extends State<MangaHomeWidget> {
         context,
         MaterialPageRoute(
           builder: (context) => MangaDiscoverWidget(
+            mangaKey: MangaKey.SEARCH,
             controller: widget.controller,
             title: 'searching for \"${_searchController.text.trim()}\"',
             hasFilter: true,
@@ -129,11 +130,12 @@ class _MangaHomeWidgetState extends State<MangaHomeWidget> {
                 context: context,
                 title: 'FOR YOU',
                 screen: MangaDiscoverWidget(
+                  key: Key(MangaKey.SUGGESTED.key),
+                  mangaKey: MangaKey.SUGGESTED,
                   title: 'FOR YOU',
                   controller: widget.controller,
                   hasFilter: false,
                   params: const {
-                    // "status[]": ["completed"],
                     'contentRating[]': ['suggestive'],
                   },
                 ),
@@ -144,6 +146,8 @@ class _MangaHomeWidgetState extends State<MangaHomeWidget> {
                 context: context,
                 title: 'ALL MANGA',
                 screen: MangaDiscoverWidget(
+                  key: Key(MangaKey.ALL.key),
+                  mangaKey: MangaKey.ALL,
                   title: 'ALL MANGA',
                   controller: widget.controller,
                   hasFilter: false,
@@ -153,6 +157,7 @@ class _MangaHomeWidgetState extends State<MangaHomeWidget> {
                 ),
               ),
               AllMangaWidget(
+                mangaKey: MangaKey.ALL,
                 controller: widget.controller,
                 canLoadMore: false,
               ),

@@ -40,16 +40,18 @@ class _MangaHomePageState extends State<MangaHomePage> {
   void initState() {
     super.initState();
 
+    var provider = Provider.of<MangaProvider>(context, listen: false);
+
     listPageView = [
       MangaHomeWidget(
         controller: _controller,
       ),
       MangaDiscoverWidget(
+        key: Key(MangaKey.DISCOVER.key),
+        mangaKey: MangaKey.DISCOVER,
         controller: _controller,
-        title: 'ALL MANGA',
-        params: const {
-          'limit': '10',
-        },
+        title: 'DISCOVER MANGA',
+        params: provider.discoverParam[MangaKey.DISCOVER.key],
       ),
       MangaBookmarkWidget(
         controller: _controller,
@@ -57,16 +59,12 @@ class _MangaHomePageState extends State<MangaHomePage> {
       // MangaProfileWidget(),
     ];
 
-    var provider = Provider.of<MangaProvider>(context, listen: false);
-
     Future.microtask(() {
       if (mounted) {
         provider.fetchMangaList(
           context,
-          MangaKey.READING.key,
-          params: {
-            'title': 'solo leveling',
-          },
+          MangaKey.READING,
+          params: provider.discoverParam[MangaKey.READING.key],
         );
       }
     });
@@ -75,11 +73,8 @@ class _MangaHomePageState extends State<MangaHomePage> {
       if (mounted) {
         provider.fetchMangaList(
           context,
-          MangaKey.SUGGESTED.key,
-          params: {
-            "status[]": ["completed"],
-            'contentRating[]': ['suggestive']
-          },
+          MangaKey.SUGGESTED,
+          params: provider.discoverParam[MangaKey.SUGGESTED.key],
         );
       }
     });
@@ -88,8 +83,8 @@ class _MangaHomePageState extends State<MangaHomePage> {
       if (mounted) {
         provider.fetchMangaList(
           context,
-          MangaKey.ALL.key,
-          params: provider.discoverParam,
+          MangaKey.ALL,
+          params: provider.discoverParam[MangaKey.ALL.key],
         );
       }
     });

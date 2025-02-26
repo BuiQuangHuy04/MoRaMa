@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 
 class Constants {
@@ -101,7 +102,10 @@ final Set<Map<String, String>> includedTags = <Map<String, String>>{
 enum MangaKey {
   READING('reading'),
   SUGGESTED('suggested'),
-  ALL('all');
+  ALL('all'),
+  SEARCH('search'),
+  DISCOVER('discover'),
+  FAVORITE('favorite');
 
   final _value;
 
@@ -110,5 +114,10 @@ enum MangaKey {
   String get key => _value;
 }
 
-String getDate(String date) =>
-    DateFormat('dd/MM/yyyy HH:mm').format(DateTime.parse(date));
+String? getDate(String date) {
+  try {
+    return DateFormat('dd/MM/yyyy HH:mm').format(DateTime.parse(date));
+  } catch (e) {
+    return date;
+  }
+}

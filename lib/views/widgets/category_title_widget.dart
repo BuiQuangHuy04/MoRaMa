@@ -1,3 +1,5 @@
+import 'package:morama/data/index.dart';
+
 import '/core/index.dart';
 
 class CategoryTitleWidget extends StatelessWidget {
@@ -31,6 +33,7 @@ class CategoryTitleWidget extends StatelessWidget {
           ),
           IconButton(
             onPressed: () {
+              Provider.of<MangaProvider>(context,listen: false).refresh();
               Navigator.push(
                 context,
                 MaterialPageRoute(

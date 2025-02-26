@@ -27,18 +27,26 @@ class Manga {
     }
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['type'] = type;
-    if (attributes != null) {
-      data['attributes'] = attributes!.toJson();
-    }
-    if (relationships != null) {
-      data['relationships'] = relationships!.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
+  // Map<String, dynamic> toJson() {
+  //   final Map<String, dynamic> data = <String, dynamic>{};
+  //   data['id'] = id;
+  //   data['type'] = type;
+  //   if (attributes != null) {
+  //     data['attributes'] = attributes!.toJson();
+  //   }
+  //   if (relationships != null) {
+  //     data['relationships'] = relationships!.map((v) => v.toJson()).toList();
+  //   }
+  //   return data;
+  // }
+
+  Map<String, dynamic> toJson() =>
+      {
+        "id": id.toString(),
+        "type": type.toString(),
+        "attributes": attributes != null ? attributes!.toJson() : {},
+        "relationships": relationships!.map((v) => v.toJson()).toList(),
+      };
 
   @override
   String toString() {

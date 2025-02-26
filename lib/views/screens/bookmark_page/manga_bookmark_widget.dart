@@ -1,8 +1,6 @@
-import 'package:morama/views/screens/bookmark_page/favorite_container.dart';
-
+import '../../index.dart';
 import '/core/index.dart';
 import '/data/index.dart';
-import '../../index.dart';
 
 class MangaBookmarkWidget extends StatefulWidget {
   final MangaController controller;
@@ -30,16 +28,19 @@ class _MangaBookmarkWidgetState extends State<MangaBookmarkWidget> {
       ),
       body: Consumer<MangaProvider>(
         builder: (context, provider, child) {
-          final favoriteMangas = provider.favoriteMangas;
+          final favoriteMangas = provider.manga[MangaKey.FAVORITE.key];
 
-          debugPrint(
-              'manga_bookmark_widget: favorite mangas: ${favoriteMangas.length}');
+          debugPrint('manga_bookmark_widget: favorite mangas: '
+              '${favoriteMangas!.length}');
 
           if (favoriteMangas.isEmpty) {
             return const Center(
               child: Text(
                 'No favorite mangas yet!',
-                style: TextStyle(color: Colors.white, fontSize: 18),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                ),
               ),
             );
           }

@@ -62,8 +62,8 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
             actions: [
               IconButton(
                 icon: Consumer<MangaProvider>(
-                  builder: (context, favoriteProvider, child) {
-                    bool isFavorite = favoriteProvider.isFavorite(widget.manga);
+                  builder: (context, provider, child) {
+                    bool isFavorite = provider.isFavorite(widget.manga);
                     return Icon(
                         isFavorite ? Icons.favorite : Icons.favorite_border);
                   },
@@ -78,7 +78,7 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
                   provider.toggleFavorite(widget.manga);
 
                   debugPrint('manga_detail_page: favorite mangas: '
-                      '${provider.favoriteMangas.length}');
+                      '${provider.manga[MangaKey.FAVORITE.key]!.length}');
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(

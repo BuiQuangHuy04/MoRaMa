@@ -16,33 +16,85 @@ class MangaProvider with ChangeNotifier, DiagnosticableTreeMixin {
     WidgetsBinding.instance.addPostFrameCallback((_) => notifyListeners());
   }
 
-  //check if home data is loaded?
   Map<String, bool> isLoading = {
     MangaKey.READING.key: false,
     MangaKey.SUGGESTED.key: false,
     MangaKey.ALL.key: false,
+    MangaKey.SEARCH.key: false,
+    MangaKey.DISCOVER.key: false,
+    MangaKey.FAVORITE.key: false,
   };
 
   Map<String, String?> error = {
     MangaKey.READING.key: null,
     MangaKey.SUGGESTED.key: null,
     MangaKey.ALL.key: null,
+    MangaKey.SEARCH.key: null,
+    MangaKey.DISCOVER.key: null,
+    MangaKey.FAVORITE.key: null,
   };
 
   Map<String, List<Manga>> manga = {
     MangaKey.READING.key: [],
     MangaKey.SUGGESTED.key: [],
     MangaKey.ALL.key: [],
+    MangaKey.SEARCH.key: [],
+    MangaKey.DISCOVER.key: [],
+    MangaKey.FAVORITE.key: [],
   };
 
+  Map<String, int> total = {
+    MangaKey.READING.key: 0,
+    MangaKey.SUGGESTED.key: 0,
+    MangaKey.ALL.key: 0,
+    MangaKey.SEARCH.key: 0,
+    MangaKey.DISCOVER.key: 0,
+    MangaKey.FAVORITE.key: 0,
+  };
+
+  Map<String, int> curOffset = {
+    MangaKey.READING.key: 0,
+    MangaKey.SUGGESTED.key: 0,
+    MangaKey.ALL.key: 0,
+    MangaKey.SEARCH.key: 0,
+    MangaKey.DISCOVER.key: 0,
+    MangaKey.FAVORITE.key: 0,
+  };
+
+  Map<String, int> curPage = {
+    MangaKey.READING.key: 0,
+    MangaKey.SUGGESTED.key: 0,
+    MangaKey.ALL.key: 0,
+    MangaKey.SEARCH.key: 0,
+    MangaKey.DISCOVER.key: 0,
+    MangaKey.FAVORITE.key: 0,
+  };
+
+  Map<String, Map<String, dynamic>> discoverParam = {
+    MangaKey.READING.key: {
+      'title': 'solo leveling',
+    },
+    MangaKey.SUGGESTED.key: {
+      "status[]": ["completed"],
+      'contentRating[]': ['suggestive']
+    },
+    MangaKey.ALL.key: {
+      "status[]": ["completed"],
+    },
+    MangaKey.SEARCH.key: {},
+    MangaKey.DISCOVER.key: {},
+    MangaKey.FAVORITE.key: {},
+  };
+
+  //check if home data is loaded?
   Future<void> fetchMangaList(
     BuildContext context,
-    String mangaKey, {
+    MangaKey mangaKey, {
     Map<String, dynamic>? params,
   }) async {
     try {
-      isLoading[mangaKey] = true;
-      error[mangaKey] = null;
+      isLoading[mangaKey.key] = true;
+      error[mangaKey.key] = null;
 
       // Fetch data using your controller
       final baseMangaRes = await MangaController(MangaRepo()).fetchListManga(
@@ -51,53 +103,49 @@ class MangaProvider with ChangeNotifier, DiagnosticableTreeMixin {
       );
 
       if (baseMangaRes.listManga != null) {
-        manga[mangaKey]?.addAll(baseMangaRes.listManga!);
+        manga[mangaKey.key]?.addAll(baseMangaRes.listManga!);
       }
 
-      if (mangaKey == MangaKey.ALL.key) {
-        total = baseMangaRes.total!;
-      }
+      updateTotalManga(baseMangaRes.total!, mangaKey.key);
     } catch (e) {
-      error[mangaKey] = e.toString();
+      error[mangaKey.key] = e.toString();
     } finally {
-      isLoading[mangaKey] = false;
+      isLoading[mangaKey.key] = false;
 
-      debugPrint('isLoading: ${isLoading[mangaKey]}');
-      debugPrint('error: ${error[mangaKey]}');
-      debugPrint('manga: ${manga[mangaKey]!.length}');
+      debugPrint('isLoading ${mangaKey.key}: ${isLoading[mangaKey.key]}');
+      debugPrint('error ${mangaKey.key}: ${error[mangaKey.key]}');
+      debugPrint('manga ${mangaKey.key}: ${manga[mangaKey.key]!.length}');
 
       listeners();
-      // notifyListeners();
     }
   }
 
   //total manga in discover tab
-  var total = 0;
-
-  void updateTotalManga(int n) {
-    total = n;
-    debugPrint('manga_provider: updateTotalManga: $total');
+  void updateTotalManga(int n, String mangaKey) {
+    total[mangaKey] = n;
+    debugPrint(
+        'manga_provider: updateTotalManga in $mangaKey: ${total[mangaKey]}');
     listeners();
   }
 
   //filter in discover tab
   Map<String, String> curFilter = <String, String>{};
 
-  void updateFilter(String filter) {
+  void updateFilter(String filter, MangaKey mangaKey) {
     if (curFilter.keys.isNotEmpty) {
       if (filter != curFilter.keys.first) {
-        manga[MangaKey.ALL.key]!.clear();
+        manga[mangaKey.key]!.clear();
 
-        curOffset = 0;
-        curPage = 0;
-        discoverParam = {};
+        curOffset[mangaKey.key] = 0;
+        curPage[mangaKey.key] = 0;
+        discoverParam[mangaKey.key] = {};
       }
     } else {
-      manga[MangaKey.ALL.key]!.clear();
+      manga[mangaKey.key]!.clear();
 
-      curOffset = 0;
-      curPage = 0;
-      discoverParam = {};
+      curOffset[mangaKey.key] = 0;
+      curPage[mangaKey.key] = 0;
+      discoverParam[mangaKey.key] = {};
     }
 
     var tempFilter = convertFilterStr(filter);
@@ -133,64 +181,97 @@ class MangaProvider with ChangeNotifier, DiagnosticableTreeMixin {
   }
 
   //paging in all manga tab
-  var curOffset = 0;
-  var curPage = 0;
-  Map<String, dynamic> discoverParam = {};
-
   void updateDiscoverParam(Map<String, dynamic> param) {
-    if (!mapEquals(discoverParam, {...discoverParam, ...param})) {
-      discoverParam.addAll(param);
+    if (!mapEquals(discoverParam[MangaKey.DISCOVER.key],
+        {...discoverParam[MangaKey.DISCOVER.key]!, ...param})) {
+      discoverParam[MangaKey.DISCOVER.key]!.addAll(param);
       listeners();
     }
   }
 
-  void nextOffset({Map<String, dynamic>? param}) {
-    curPage += 1;
-    curOffset = curPage * 10;
-    if (discoverParam.containsKey('offset')) {
-      discoverParam.update('offset', (value) => curOffset.toString());
+  void nextOffset(MangaKey mangaKey, {Map<String, dynamic>? param}) {
+    curPage[mangaKey.key] = curPage[mangaKey.key]! + 1;
+    curOffset[mangaKey.key] = curPage[mangaKey.key]! * 10;
+    if (discoverParam[mangaKey.key]!.containsKey('offset')) {
+      discoverParam[mangaKey.key]!
+          .update('offset', (value) => curOffset[mangaKey.key].toString());
     } else {
-      discoverParam.addAll({'offset': curOffset.toString()});
+      discoverParam[mangaKey.key]!
+          .addAll({'offset': curOffset[mangaKey.key].toString()});
     }
     if (param != null) {
-      discoverParam.addAll(param);
+      discoverParam[mangaKey.key]!.addAll(param);
     }
 
     listeners();
   }
 
-  void preOffset({Map<String, dynamic>? param}) {
-    curPage -= 1;
-    curOffset = curPage * 10;
-    discoverParam.update('offset', (value) => curOffset.toString());
+  void preOffset(MangaKey mangaKey, {Map<String, dynamic>? param}) {
+    curPage[mangaKey.key] = curPage[mangaKey.key]! - 1;
+    curOffset[mangaKey.key] = curPage[mangaKey.key]! * 10;
+    discoverParam[mangaKey.key]!
+        .update('offset', (value) => curOffset.toString());
     if (param != null) {
-      discoverParam.addAll(param);
+      discoverParam[mangaKey.key]!.addAll(param);
     }
     listeners();
   }
 
   //refresh
   void refresh() {
-    total = 0;
+    total.forEach((key, value) => total[key] = 0);
     curFilter = <String, String>{};
     listeners();
   }
 
   //manga favorite
-  final List<Manga> _favoriteMangas = [];
-
-  List<Manga> get favoriteMangas => _favoriteMangas;
-
-  void toggleFavorite(Manga manga) {
-    if (_favoriteMangas.contains(manga)) {
-      _favoriteMangas.remove(manga);
+  void toggleFavorite(Manga favoriteManga) async {
+    if (manga[MangaKey.FAVORITE.key]!.any((m) => m.id == favoriteManga.id)) {
+      manga[MangaKey.FAVORITE.key]!
+          .removeWhere((m) => m.id == favoriteManga.id);
     } else {
-      _favoriteMangas.add(manga);
+      manga[MangaKey.FAVORITE.key]!.add(favoriteManga);
     }
-    notifyListeners();
+    listeners();
+    await _saveFavorites();
   }
 
-  bool isFavorite(Manga manga) {
-    return _favoriteMangas.contains(manga);
+  bool isFavorite(Manga favoriteManga) {
+    return manga[MangaKey.FAVORITE.key]!.any((m) => m.id == favoriteManga.id);
   }
+
+  Future<void> _saveFavorites() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> idList =
+        manga[MangaKey.FAVORITE.key]!.map((manga) => manga.id!).toList();
+    await prefs.setStringList('favorite_mangas', idList).whenComplete(() {
+      debugPrint('save favorite: saved: $idList');
+    });
+  }
+
+  Future<void> loadFavorites() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String>? idList = prefs.getStringList('favorite_mangas');
+
+    debugPrint('load favorite: loaded: $idList');
+    if (idList != null) {
+      for (String id in idList) {
+        var _manga = await MangaController(MangaRepo()).fetchManga(
+          id,
+        );
+        manga[MangaKey.FAVORITE.key]!.add(_manga);
+      }
+
+      listeners();
+    }
+  }
+
+//chapters bookmark saving
+// click read a chapter
+// -> chapter img fetching
+// -> save chapter id with manga id as Map in SP
+//
+// chapters bookmark loading
+// app start
+// -> load reading manga -> click on that -> show the reading progressing
 }

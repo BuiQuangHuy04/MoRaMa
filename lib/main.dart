@@ -1,15 +1,20 @@
-import 'package:morama/data/providers/home_provider.dart';
-
 import 'views/index.dart';
 import 'core/index.dart';
 import 'data/index.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final homeProvider = HomeProvider();
+
+  final favoriteProvider = MangaProvider();
+  await favoriteProvider.loadFavorites();
+
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => MangaProvider()),
-        ChangeNotifierProvider(create: (_) => HomeProvider()),
+        ChangeNotifierProvider(create: (_) => favoriteProvider),
+        ChangeNotifierProvider(create: (_) => homeProvider),
       ],
       child: const MangaApp(),
     ),
