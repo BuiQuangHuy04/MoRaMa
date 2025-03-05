@@ -1,14 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:morama/data/index.dart';
 
+import '../../core/index.dart';
+
 abstract class Repository {
   Future<Manga> getManga(
     String id,
   );
 
   Future<BaseMangaResponse> getListManga(
-    BuildContext context, {
+    BuildContext context,
+    MangaKey mangaKey, {
     Map<String, dynamic>? params,
+    MangaProvider? provider,
   });
 
   Future<String> getFileNameCover({required String mangaId});

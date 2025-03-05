@@ -30,29 +30,10 @@ class _MangaHomeWidgetState extends State<MangaHomeWidget> {
     if (title.isNotEmpty) {
       // Fetch new data with query
       debugPrint("Fetching manga for param: $param");
-      // Call your API fetch function here
-      // var provider = Provider.of<MangaProvider>(context, listen: false);
-      //
-      // if (provider.manga[MangaKey.ALL.key] != null) {
-      //   provider.manga[MangaKey.ALL.key]!.clear();
-      //
-      //   provider.curPage = 0;
-      //   provider.curOffset = 0;
-      // }
-      //
-      // WidgetsBinding.instance.addPostFrameCallback((_) {
-      //   Future.microtask(() {
-      //     if (mounted) {
-      //       provider.fetchMangaList(
-      //         context,
-      //         MangaKey.ALL.key,
-      //         params: param,
-      //       );
-      //     }
-      //   });
-      // });
-      //
-      // Future.delayed(const Duration(milliseconds: 500));
+      Provider.of<MangaProvider>(
+        context,
+        listen: false,
+      ).params[MangaKey.SEARCH.key]!.addAll(param);
 
       Navigator.push(
         context,
@@ -60,9 +41,8 @@ class _MangaHomeWidgetState extends State<MangaHomeWidget> {
           builder: (context) => MangaDiscoverWidget(
             mangaKey: MangaKey.SEARCH,
             controller: widget.controller,
-            title: 'searching for \"${_searchController.text.trim()}\"',
-            hasFilter: true,
-            params: param,
+            title: 'searching for "${_searchController.text.trim()}"',
+            hasFilter: false,
           ),
         ),
       );
@@ -71,6 +51,24 @@ class _MangaHomeWidgetState extends State<MangaHomeWidget> {
 
   @override
   void initState() {
+    debugPrint('manga_home_widget init');
+    var provider = Provider.of<MangaProvider>(
+      context,
+      listen: false,
+    );
+    for (var mangaKey in provider.manga.keys) {
+      if (provider.manga[mangaKey] != null) {
+        if (provider.manga[mangaKey]!.length > 10) {
+          List<Manga> tempList = provider.manga[mangaKey]!.sublist(0, 10);
+          provider.manga[mangaKey]!.clear();
+          provider.manga[mangaKey]!.addAll(tempList);
+
+          provider.curPage[mangaKey] = 0;
+          provider.curOffset[mangaKey] = 0;
+        }
+      }
+      ;
+    }
     super.initState();
   }
 
@@ -106,7 +104,9 @@ class _MangaHomeWidgetState extends State<MangaHomeWidget> {
                     focusColor: Colors.amberAccent,
                   ),
                 )
-              : const Text("NOW"),
+              : const Text(
+                  "HOME",
+                ),
           centerTitle: true,
           actions: [
             _isSearching
@@ -135,9 +135,6 @@ class _MangaHomeWidgetState extends State<MangaHomeWidget> {
                   title: 'FOR YOU',
                   controller: widget.controller,
                   hasFilter: false,
-                  params: const {
-                    'contentRating[]': ['suggestive'],
-                  },
                 ),
               ),
               SuggestedMangaWidget(controller: widget.controller),
@@ -151,9 +148,6 @@ class _MangaHomeWidgetState extends State<MangaHomeWidget> {
                   title: 'ALL MANGA',
                   controller: widget.controller,
                   hasFilter: false,
-                  params: const {
-                    'limit': '10',
-                  },
                 ),
               ),
               AllMangaWidget(

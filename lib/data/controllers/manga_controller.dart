@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
+import '../../core/index.dart';
 import '../index.dart';
 
 class MangaController {
@@ -18,9 +19,18 @@ class MangaController {
     return _repo.getManga(id);
   }
 
-  Future<BaseMangaResponse> fetchListManga(BuildContext context,
-      {Map<String, dynamic>? params}) {
-    return _repo.getListManga(context, params: params);
+  Future<BaseMangaResponse> fetchListManga(
+    BuildContext context,
+    MangaKey mangaKey, {
+    Map<String, dynamic>? params,
+    MangaProvider? provider,
+  }) {
+    return _repo.getListManga(
+      context,
+      mangaKey,
+      params: params,
+      provider: provider,
+    );
   }
 
   Future<String> fetchFileNameCover({required String mangaId}) {

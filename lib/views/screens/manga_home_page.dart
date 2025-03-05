@@ -51,7 +51,6 @@ class _MangaHomePageState extends State<MangaHomePage> {
         mangaKey: MangaKey.DISCOVER,
         controller: _controller,
         title: 'DISCOVER MANGA',
-        params: provider.discoverParam[MangaKey.DISCOVER.key],
       ),
       MangaBookmarkWidget(
         controller: _controller,
@@ -64,7 +63,6 @@ class _MangaHomePageState extends State<MangaHomePage> {
         provider.fetchMangaList(
           context,
           MangaKey.READING,
-          params: provider.discoverParam[MangaKey.READING.key],
         );
       }
     });
@@ -74,7 +72,6 @@ class _MangaHomePageState extends State<MangaHomePage> {
         provider.fetchMangaList(
           context,
           MangaKey.SUGGESTED,
-          params: provider.discoverParam[MangaKey.SUGGESTED.key],
         );
       }
     });
@@ -84,7 +81,6 @@ class _MangaHomePageState extends State<MangaHomePage> {
         provider.fetchMangaList(
           context,
           MangaKey.ALL,
-          params: provider.discoverParam[MangaKey.ALL.key],
         );
       }
     });

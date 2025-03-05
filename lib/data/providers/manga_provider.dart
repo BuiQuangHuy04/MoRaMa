@@ -70,61 +70,99 @@ class MangaProvider with ChangeNotifier, DiagnosticableTreeMixin {
     MangaKey.FAVORITE.key: 0,
   };
 
-  Map<String, Map<String, dynamic>> discoverParam = {
-    MangaKey.READING.key: {
-      'title': 'solo leveling',
-    },
+  Map<String, Map<String, dynamic>> params = {
+    MangaKey.READING.key: {},
     MangaKey.SUGGESTED.key: {
       "status[]": ["completed"],
-      'contentRating[]': ['suggestive']
+      'contentRating[]': ['suggestive'],
     },
     MangaKey.ALL.key: {
       "status[]": ["completed"],
     },
-    MangaKey.SEARCH.key: {},
+    MangaKey.SEARCH.key: {
+      "status[]": ["completed"],
+    },
     MangaKey.DISCOVER.key: {},
     MangaKey.FAVORITE.key: {},
+  };
+
+  Map<String, Map<String, String>> order = {
+    MangaKey.SUGGESTED.key: {},
+    MangaKey.ALL.key: {},
+    MangaKey.SEARCH.key: {},
+    MangaKey.DISCOVER.key: {},
   };
 
   //check if home data is loaded?
   Future<void> fetchMangaList(
     BuildContext context,
     MangaKey mangaKey, {
-    Map<String, dynamic>? params,
+    bool? addToOld,
   }) async {
     try {
       isLoading[mangaKey.key] = true;
       error[mangaKey.key] = null;
 
+      debugPrint('manga_provider: fetch list manga: order in '
+          '${mangaKey.key}: ${order[mangaKey.key]}');
+
+      if (order[mangaKey.key] != null) {
+        if (order[mangaKey.key]!.isNotEmpty) {
+          params[mangaKey.key]!.addAll({
+            'order[${order[mangaKey.key]!.keys.first}]':
+                order[mangaKey.key]!.values.first
+          });
+        }
+      }
+
+      if (params[mangaKey.key]!.containsKey('offset')) {
+        params[mangaKey.key]!
+            .update('offset', (value) => curOffset[mangaKey.key].toString());
+      } else {
+        params[mangaKey.key]!
+            .addAll({'offset': curOffset[mangaKey.key].toString()});
+      }
+
+      debugPrint('manga_provider: fetch list manga: params in '
+          '${mangaKey.key}: ${params[mangaKey.key]}');
+
       // Fetch data using your controller
       final baseMangaRes = await MangaController(MangaRepo()).fetchListManga(
         context,
-        params: params,
+        mangaKey,
+        params: params[mangaKey.key],
+        provider: this,
       );
 
       if (baseMangaRes.listManga != null) {
+        if (addToOld == false) {
+          manga[mangaKey.key]?.clear();
+        }
         manga[mangaKey.key]?.addAll(baseMangaRes.listManga!);
       }
 
-      updateTotalManga(baseMangaRes.total!, mangaKey.key);
+      updateTotalManga(baseMangaRes.total!, mangaKey);
     } catch (e) {
       error[mangaKey.key] = e.toString();
     } finally {
       isLoading[mangaKey.key] = false;
 
-      debugPrint('isLoading ${mangaKey.key}: ${isLoading[mangaKey.key]}');
-      debugPrint('error ${mangaKey.key}: ${error[mangaKey.key]}');
-      debugPrint('manga ${mangaKey.key}: ${manga[mangaKey.key]!.length}');
+      debugPrint('manga_provider: fetch list manga: isLoading '
+          '${mangaKey.key}: ${isLoading[mangaKey.key]}');
+      debugPrint('manga_provider: fetch list manga: error '
+          '${mangaKey.key}: ${error[mangaKey.key]}');
+      debugPrint('manga_provider: fetch list manga: manga '
+          '${mangaKey.key}: ${manga[mangaKey.key]!.length}');
 
       listeners();
     }
   }
 
   //total manga in discover tab
-  void updateTotalManga(int n, String mangaKey) {
-    total[mangaKey] = n;
-    debugPrint(
-        'manga_provider: updateTotalManga in $mangaKey: ${total[mangaKey]}');
+  void updateTotalManga(int n, MangaKey mangaKey) {
+    total[mangaKey.key] = n;
+    debugPrint('manga_provider: updateTotalManga in '
+        '${mangaKey.key}: ${total[mangaKey.key]}');
     listeners();
   }
 
@@ -138,14 +176,14 @@ class MangaProvider with ChangeNotifier, DiagnosticableTreeMixin {
 
         curOffset[mangaKey.key] = 0;
         curPage[mangaKey.key] = 0;
-        discoverParam[mangaKey.key] = {};
+        params[mangaKey.key] = {};
       }
     } else {
       manga[mangaKey.key]!.clear();
 
       curOffset[mangaKey.key] = 0;
       curPage[mangaKey.key] = 0;
-      discoverParam[mangaKey.key] = {};
+      params[mangaKey.key] = {};
     }
 
     var tempFilter = convertFilterStr(filter);
@@ -180,11 +218,14 @@ class MangaProvider with ChangeNotifier, DiagnosticableTreeMixin {
     return null;
   }
 
-  //paging in all manga tab
+  //TODO
+  //sorting in discover manga tab
+
+  //paging in discover manga tab
   void updateDiscoverParam(Map<String, dynamic> param) {
-    if (!mapEquals(discoverParam[MangaKey.DISCOVER.key],
-        {...discoverParam[MangaKey.DISCOVER.key]!, ...param})) {
-      discoverParam[MangaKey.DISCOVER.key]!.addAll(param);
+    if (!mapEquals(params[MangaKey.DISCOVER.key],
+        {...params[MangaKey.DISCOVER.key]!, ...param})) {
+      params[MangaKey.DISCOVER.key]!.addAll(param);
       listeners();
     }
   }
@@ -192,15 +233,15 @@ class MangaProvider with ChangeNotifier, DiagnosticableTreeMixin {
   void nextOffset(MangaKey mangaKey, {Map<String, dynamic>? param}) {
     curPage[mangaKey.key] = curPage[mangaKey.key]! + 1;
     curOffset[mangaKey.key] = curPage[mangaKey.key]! * 10;
-    if (discoverParam[mangaKey.key]!.containsKey('offset')) {
-      discoverParam[mangaKey.key]!
+    if (params[mangaKey.key]!.containsKey('offset')) {
+      params[mangaKey.key]!
           .update('offset', (value) => curOffset[mangaKey.key].toString());
     } else {
-      discoverParam[mangaKey.key]!
+      params[mangaKey.key]!
           .addAll({'offset': curOffset[mangaKey.key].toString()});
     }
     if (param != null) {
-      discoverParam[mangaKey.key]!.addAll(param);
+      params[mangaKey.key]!.addAll(param);
     }
 
     listeners();
@@ -209,17 +250,21 @@ class MangaProvider with ChangeNotifier, DiagnosticableTreeMixin {
   void preOffset(MangaKey mangaKey, {Map<String, dynamic>? param}) {
     curPage[mangaKey.key] = curPage[mangaKey.key]! - 1;
     curOffset[mangaKey.key] = curPage[mangaKey.key]! * 10;
-    discoverParam[mangaKey.key]!
-        .update('offset', (value) => curOffset.toString());
+    if (params[mangaKey.key]!.containsKey('offset')) {
+      params[mangaKey.key]!
+          .update('offset', (value) => curOffset[mangaKey.key].toString());
+    } else {
+      params[mangaKey.key]!
+          .addAll({'offset': curOffset[mangaKey.key].toString()});
+    }
     if (param != null) {
-      discoverParam[mangaKey.key]!.addAll(param);
+      params[mangaKey.key]!.addAll(param);
     }
     listeners();
   }
 
   //refresh
   void refresh() {
-    total.forEach((key, value) => total[key] = 0);
     curFilter = <String, String>{};
     listeners();
   }

@@ -6,7 +6,7 @@ class Attributes {
   List<AltTitles>? altTitles;
   Description? description;
   bool? isLocked;
-  Links? links;
+  // Links? links;
   String? originalLanguage;
   String? lastVolume;
   String? lastChapter;
@@ -14,7 +14,7 @@ class Attributes {
   String? status;
   int? year;
   String? contentRating;
-  List<Tags>? tags;
+  // List<Tags>? tags;
   String? state;
   bool? chapterNumbersResetOnNewVolume;
   String? createdAt;
@@ -28,7 +28,7 @@ class Attributes {
     this.altTitles,
     this.description,
     this.isLocked,
-    this.links,
+    // this.links,
     this.originalLanguage,
     this.lastVolume,
     this.lastChapter,
@@ -36,7 +36,7 @@ class Attributes {
     this.status,
     this.year,
     this.contentRating,
-    this.tags,
+    // this.tags,
     this.state,
     this.chapterNumbersResetOnNewVolume,
     this.createdAt,
@@ -58,7 +58,7 @@ class Attributes {
         ? Description.fromJson(json['description'])
         : null;
     isLocked = json['isLocked'];
-    links = json['links'] != null ? Links.fromJson(json['links']) : null;
+    // links = json['links'] != null ? Links.fromJson(json['links']) : null;
     originalLanguage = json['originalLanguage'];
     lastVolume = json['lastVolume'];
     lastChapter = json['lastChapter'];
@@ -66,12 +66,12 @@ class Attributes {
     status = json['status'];
     year = json['year'];
     contentRating = json['contentRating'];
-    if (json['tags'] != null) {
-      tags = <Tags>[];
-      json['tags'].forEach((v) {
-        tags!.add(Tags.fromJson(v));
-      });
-    }
+    // if (json['tags'] != null) {
+    //   tags = <Tags>[];
+    //   json['tags'].forEach((v) {
+    //     tags!.add(Tags.fromJson(v));
+    //   });
+    // }
     state = json['state'];
     chapterNumbersResetOnNewVolume = json['chapterNumbersResetOnNewVolume'];
     createdAt = getDate(json['createdAt']);
@@ -94,9 +94,9 @@ class Attributes {
       data['description'] = description!.toJson();
     }
     data['isLocked'] = isLocked;
-    if (links != null) {
-      data['links'] = links!.toJson();
-    }
+    // if (links != null) {
+    //   data['links'] = links!.toJson();
+    // }
     data['originalLanguage'] = originalLanguage;
     data['lastVolume'] = lastVolume;
     data['lastChapter'] = lastChapter;
@@ -104,9 +104,9 @@ class Attributes {
     data['status'] = status;
     data['year'] = year;
     data['contentRating'] = contentRating;
-    if (tags != null) {
-      data['tags'] = tags!.map((v) => v.toJson()).toList();
-    }
+    // if (tags != null) {
+    //   data['tags'] = tags!.map((v) => v.toJson()).toList();
+    // }
     data['state'] = state;
     data['chapterNumbersResetOnNewVolume'] = chapterNumbersResetOnNewVolume;
     data['createdAt'] = createdAt;
@@ -119,6 +119,27 @@ class Attributes {
 
   @override
   String toString() {
-    return 'Attributes{title: $title, altTitles: $altTitles, description: $description, isLocked: $isLocked, links: $links, originalLanguage: $originalLanguage, lastVolume: $lastVolume, lastChapter: $lastChapter, publicationDemographic: $publicationDemographic, status: $status, year: $year, contentRating: $contentRating, tags: $tags, state: $state, chapterNumbersResetOnNewVolume: $chapterNumbersResetOnNewVolume, createdAt: $createdAt, updatedAt: $updatedAt, version: $version, availableTranslatedLanguages: $availableTranslatedLanguages, latestUploadedChapter: $latestUploadedChapter}';
+    return 'Attributes{'
+        'title: $title, '
+        'altTitles: $altTitles, '
+        'description: $description, '
+        'isLocked: $isLocked, '
+        // 'links: $links, '
+        'originalLanguage: $originalLanguage, '
+        'lastVolume: $lastVolume, '
+        'lastChapter: $lastChapter, '
+        'publicationDemographic: $publicationDemographic, '
+        'status: $status, '
+        'year: $year, '
+        'contentRating: $contentRating, '
+        // 'tags: $tags, '
+        'state: $state, '
+        'chapterNumbersResetOnNewVolume: $chapterNumbersResetOnNewVolume, '
+        'createdAt: $createdAt, '
+        'updatedAt: $updatedAt, '
+        'version: $version, '
+        'availableTranslatedLanguages: $availableTranslatedLanguages, '
+        'latestUploadedChapter: $latestUploadedChapter'
+        '}';
   }
 }

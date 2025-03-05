@@ -62,29 +62,29 @@ class FavoriteContainer extends StatelessWidget {
                       color: Colors.grey,
                     ),
                   ),
-                  const Gap(24),
-                  const Row(
-                    children: [
-                      Text(
-                        "78%",
-                        style: TextStyle(
-                          color: Colors.amberAccent,
-                        ),
-                      ),
-                      Gap(12),
-                      Text(
-                        "20 chapters left",
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Gap(4),
-                  const LinearProgressIndicator(
-                    value: .7,
-                    color: Colors.amberAccent,
-                  ),
+                  // const Gap(24),
+                  // const Row(
+                  //   children: [
+                  //     Text(
+                  //       "78%",
+                  //       style: TextStyle(
+                  //         color: Colors.amberAccent,
+                  //       ),
+                  //     ),
+                  //     Gap(12),
+                  //     Text(
+                  //       "20 chapters left",
+                  //       style: TextStyle(
+                  //         color: Colors.white,
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
+                  // const Gap(4),
+                  // const LinearProgressIndicator(
+                  //   value: .7,
+                  //   color: Colors.amberAccent,
+                  // ),
                   // const Gap(10),
                   // Container(
                   //   padding: const EdgeInsets.symmetric(vertical: 8),

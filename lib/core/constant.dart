@@ -114,6 +114,38 @@ enum MangaKey {
   String get key => _value;
 }
 
+enum MangaOrder {
+  //&order%5B[MangaOrder.key]%5D=[asc/desc]
+  TITLE('title', 'Title'),
+  YEAR('year', 'Year'),
+  CREATED('createdAt', 'Released time'),
+  UPDATED('updatedAt', 'Updated time'),
+  LASTESTCHAPTER('latestUploadedChapter', 'Latest chapter uploaded'),
+  FOLLOWED('followedCount', 'Number of followers'),
+  RELEVANCE('relevance', 'Relevance');
+
+  final _key;
+  final _value;
+
+  const MangaOrder(this._value, this._key);
+
+  String get label => _key;
+
+  String get value => _value;
+}
+
+
+enum Sorting {
+  ASC('asc'),
+  DESC('desc');
+
+  final String _key;
+
+  const Sorting(this._key);
+
+  String get value => _key;
+}
+
 String? getDate(String date) {
   try {
     return DateFormat('dd/MM/yyyy HH:mm').format(DateTime.parse(date));

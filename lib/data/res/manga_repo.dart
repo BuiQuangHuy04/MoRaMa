@@ -83,18 +83,30 @@ class MangaRepo implements Repository {
   }
 
   @override
-  Future<BaseMangaResponse> getListManga(BuildContext context,
-      {Map<String, dynamic>? params}) async {
+  Future<BaseMangaResponse> getListManga(
+    BuildContext context,
+    MangaKey mangaKey, {
+    Map<String, dynamic>? params,
+    MangaProvider? provider,
+  }) async {
     Map<String, dynamic> params0 = {
       'status[]': ['completed'],
       'includes[]': ['cover_art', 'artist', 'author'],
-      // 'limit':'20',
     };
 
-    if (params != null) {
-      params0.addAll(params);
-      debugPrint('manga_repo: getListManga: _params: $params0');
+    if (params![mangaKey.key] != null) {
+      debugPrint('manga_repo: getListManga: params in ${mangaKey.key}: '
+          '${params[mangaKey.key]}');
+
+      params0.addAll(params[mangaKey.key]);
+    } else if (provider!.params[mangaKey.key] != null) {
+      debugPrint('manga_repo: getListManga: params in ${mangaKey.key}: '
+          '${provider.params[mangaKey.key]}');
+
+      params0.addAll(provider.params[mangaKey.key]!);
     }
+
+    debugPrint('manga_repo: getListManga: _params: $params0');
 
     var url = Uri.https(
       Constants.api,

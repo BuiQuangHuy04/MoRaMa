@@ -48,7 +48,7 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
             titleTextStyle: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 24,
-              color: Colors.black,
+              color: Colors.white,
             ),
             centerTitle: true,
             pinned: true,
@@ -295,7 +295,7 @@ class _MangaDetailPageState extends State<MangaDetailPage> {
                                                             FontWeight.normal,
                                                         fontSize: 14,
                                                         overflow:
-                                                            TextOverflow.clip,
+                                                            TextOverflow.fade,
                                                       ),
                                                     ),
                                                   ],

@@ -26,9 +26,29 @@ class MangaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    ThemeData appTheme = ThemeData(
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: Colors.amberAccent,
+        primary: Colors.amber,
+        secondary: Colors.amberAccent,
+      ),
+      textTheme: const TextTheme(),
+      appBarTheme: const AppBarTheme(
+        // backgroundColor: Colors.deepPurple,
+        foregroundColor: Colors.white,
+        titleTextStyle: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
+      useMaterial3: true,
+    );
+
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MangaHomePage(),
+      home: const MangaHomePage(),
+      theme: appTheme,
     );
   }
 }
