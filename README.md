@@ -18,8 +18,8 @@ favorite stories anytime, anywhere.
 
 ## Screenshots
 
-<img width="154" src="https://github.com/user-attachments/assets/591ed679-b599-402f-a94b-583d9f799228">
-<img width="154" src="https://github.com/user-attachments/assets/298f8e91-bbc2-4493-8bc8-05cbe193a04c">
-<img width="154" src="https://github.com/user-attachments/assets/87ef5adc-4d36-438b-aa1e-ff8b0f828baa">
-<img width="154" src="https://github.com/user-attachments/assets/94b11c9c-7f08-4dc1-bc4e-7da62c72ef51">
-<img width="154" src="https://github.com/user-attachments/assets/9ac65cf9-064a-4faa-936f-4311cffa2aff">
+![Screenshot_2025-03-07-20-17-10-764_com example morama](https://github.com/user-attachments/assets/d903db17-1359-4fc9-ab8e-47732049b3d3)
+![Screenshot_2025-03-07-20-17-32-753_com example morama](https://github.com/user-attachments/assets/924a8591-30b4-45dc-88f5-fc39a295d969)
+![Screenshot_2025-03-07-20-17-41-065_com example morama](https://github.com/user-attachments/assets/486dc539-92d2-43ce-983f-9f1e41ce24a1)
+![Screenshot_2025-03-07-20-17-56-252_com example morama](https://github.com/user-attachments/assets/d7835263-6e61-4f14-9798-814a0c78a279)
+![Screenshot_2025-03-07-20-18-07-289_com example morama](https://github.com/user-attachments/assets/8325535d-6cc7-464d-8601-4f978dbd0767)
