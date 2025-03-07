@@ -18,8 +18,8 @@ favorite stories anytime, anywhere.
 
 ## Screenshots
 
-![alt text](https://github.com/user-attachments/assets/591ed679-b599-402f-a94b-583d9f799228)
-![alt text](https://github.com/user-attachments/assets/298f8e91-bbc2-4493-8bc8-05cbe193a04c)
-![alt text](https://github.com/user-attachments/assets/87ef5adc-4d36-438b-aa1e-ff8b0f828baa)
-![alt text](https://github.com/user-attachments/assets/94b11c9c-7f08-4dc1-bc4e-7da62c72ef51)
-![alt text](https://github.com/user-attachments/assets/9ac65cf9-064a-4faa-936f-4311cffa2aff)
+<img src="https://github.com/user-attachments/assets/591ed679-b599-402f-a94b-583d9f799228">
+<img src="https://github.com/user-attachments/assets/298f8e91-bbc2-4493-8bc8-05cbe193a04c">
+<img src="https://github.com/user-attachments/assets/87ef5adc-4d36-438b-aa1e-ff8b0f828baa">
+<img src="https://github.com/user-attachments/assets/94b11c9c-7f08-4dc1-bc4e-7da62c72ef51">
+<img src="https://github.com/user-attachments/assets/9ac65cf9-064a-4faa-936f-4311cffa2aff">
